@@ -19,28 +19,28 @@ public class RoadFixer : MonoBehaviour
         roadCount = result.Where(x => x == CellType.Road).Count();
         if (roadCount == 1)
         {
+            // Debug.Log("triggered create: dead end");
             CreateDeadEnd(placementManager, result, temporaryPosition);
-            Debug.Log("triggered create: dead end");
         }
         else if (roadCount == 2)
         {
             if (CreateStraightRoad(placementManager, result, temporaryPosition))
             {
-                Debug.Log("triggered create: straight road");
+                // Debug.Log("triggered create: straight road");
                 return;
             }
+            // Debug.Log("triggered create: corner");
             CreateCorner(placementManager, result, temporaryPosition);
-            Debug.Log("triggered create: corner");
         }
         else if (roadCount == 3)
         {
+            // Debug.Log("triggered create: three way");
             CreateThreeWay(placementManager, result, temporaryPosition);
-            Debug.Log("triggered create: three way");
         }
         else
         {
+            // Debug.Log("triggered create: four way");
             CreateFourWay(placementManager, result, temporaryPosition);
-            Debug.Log("triggered create: four way");
         }
     }
 

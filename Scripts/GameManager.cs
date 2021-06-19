@@ -9,16 +9,31 @@ public class GameManager : MonoBehaviour
     public CameraMovement cameraMovement;
     public InputManager inputManager;
     public RoadManager roadManager;
+    public UIController uIController;
 
     private void Start()
     {
-        inputManager.OnMouseClick += HandleMouseClick;
+        uIController.OnRoadPlacement += RoadPlacementHandler;
+    }
+
+    private void RoadPlacementHandler()
+    {
+        ClearInputActions();
+        inputManager.OnMouseClick += roadManager.PlaceRoad;
+        inputManager.OnMouseHold += roadManager.PlaceRoad;
+        inputManager.OnMouseUp += roadManager.FinishPlacingRoad;
+    }
+
+    private void ClearInputActions()
+    {
+        inputManager.OnMouseClick = null;
+        inputManager.OnMouseHold = null;
+        inputManager.OnMouseUp = null; 
     }
 
     private void HandleMouseClick(Vector3Int position)
     {
         Debug.Log(position);
-        roadManager.PlaceRoad(position); 
     }
 
     private void Update()
