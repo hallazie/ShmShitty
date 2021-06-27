@@ -60,6 +60,13 @@ public class StructureManager : MonoBehaviour
             return false;
         return true;
     }
+
+    void RotateStructurePrefabToFaceRoad(GameObject structure, Vector3Int position) { 
+    {
+        List<Vector3Int> roadNeighbour = placementManager.GetNeighboursOfType(position, CellType.Road);
+        if (roadNeighbour.Count == 0)
+            return;
+    }
 }
 
 
