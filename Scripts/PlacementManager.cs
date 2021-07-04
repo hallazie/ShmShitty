@@ -30,9 +30,12 @@ public class PlacementManager : MonoBehaviour
         return placementGrid.GetAllAdjacentCellTypes(position.x, position.z);
     }
 
-    internal void PlaceObjectOnTheMap(Vector3Int position, GameObject prefab, CellType structure)
+    internal void PlaceObjectOnTheMap(Vector3Int position, GameObject structurePrefab, CellType type)
     {
-        throw new NotImplementedException();
+        placementGrid[position.x, position.z] = type;
+        // GameObject newStructure = Instantiate(roadStraight, position, Quaternion.identity); 
+        StructureModel structure = CreateANewStructureModel(position, structurePrefab, type);
+        structureDictionary.Add(position, structure);
     }
 
     internal bool CheckIfPositionIsFree(Vector3Int position)
