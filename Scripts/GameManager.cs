@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     public CameraMovement cameraMovement;
     public InputManager inputManager;
     public RoadManager roadManager;
+    public StructureManager structureManager;
     public UIController uIController;
 
     private void Start()
@@ -16,16 +17,19 @@ public class GameManager : MonoBehaviour
         uIController.OnRoadPlacement += RoadPlacementHandler;
         uIController.OnHousePlacement += HoushPlacementHandler;
         uIController.OnSpecialPlacement += SpacialPlacementHandler;
+        uIController.OnBigPlacement += BigPlacementHandler;
     }
 
     private void SpacialPlacementHandler()
     {
         ClearInputActions();
+        inputManager.OnMouseClick += structureManager.PlaceSpecial;
     }
 
     private void HoushPlacementHandler()
     {
         ClearInputActions();
+        inputManager.OnMouseClick += structureManager.PlaceHouse;
     }
 
     private void RoadPlacementHandler()
@@ -34,6 +38,12 @@ public class GameManager : MonoBehaviour
         inputManager.OnMouseClick += roadManager.PlaceRoad;
         inputManager.OnMouseHold += roadManager.PlaceRoad;
         inputManager.OnMouseUp += roadManager.FinishPlacingRoad;
+    }
+
+    private void BigPlacementHandler()
+    {
+        ClearInputActions();
+        inputManager.OnMouseClick += structureManager.placeBig;
     }
 
     private void ClearInputActions()
