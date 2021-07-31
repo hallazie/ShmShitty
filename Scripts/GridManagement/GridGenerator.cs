@@ -8,7 +8,7 @@ public class GridGenerator
 
     public List<GridPolygon> GenerateDelaunayGrid(List<GridVertex> vertexList)
     {
-        DelaunatorSharp.IPoint[] pointList = new DelaunatorSharp.IPoint[vertexList.Count];
+        IPoint[] pointList = new IPoint[vertexList.Count];
         List<GridPolygon> polygonList = new List<GridPolygon>();
         for(int i = 0; i < vertexList.Count; i++)
         {
