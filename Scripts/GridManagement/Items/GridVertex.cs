@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GridVertex : MonoBehaviour
+public class GridVertex
 {
 
     public float x;
@@ -16,6 +16,13 @@ public class GridVertex : MonoBehaviour
         this.x = x;
         this.y = y;
         this.layer = layer;
+    }
+
+    public GridVertex(GridVertex other)
+    {
+        this.x = other.x;
+        this.y = other.y;
+        this.layer = other.layer;
     }
 
     public override bool Equals(object other)
@@ -37,6 +44,11 @@ public class GridVertex : MonoBehaviour
             hash = hash * 23 + y.GetHashCode();
             return hash;
         }
+    }
+
+    public Vector3 ToVector3()
+    {
+        return new Vector3(x, 0, y);
     }
 
     public override string ToString()

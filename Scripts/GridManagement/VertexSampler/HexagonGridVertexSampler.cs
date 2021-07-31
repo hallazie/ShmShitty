@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HexagonGridVertexSampler : MonoBehaviour
+public class HexagonGridVertexSampler
 {
     private int layer;
     private float root3;

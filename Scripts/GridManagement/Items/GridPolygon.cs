@@ -1,19 +1,30 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class GridPolygon : MonoBehaviour
+public class GridPolygon
 {
 
-    protected List<GridVertex> gridVertexList;
+    public List<GridVertex> gridVertexList = new List<GridVertex>();
     public string type;
 
-    private GridVertex _center;
+    private GridVertex _center = null;
     private float _sideLength;
 
     public GridPolygon(List<GridVertex> vertexList)
     {
         gridVertexList = vertexList;
+        SortGridVertexClockwise();
+    }
+
+    public GridPolygon(GridPolygon other)
+    {
+        this.gridVertexList.Clear();
+        foreach (GridVertex vertex in other.gridVertexList)
+        {
+            this.gridVertexList.Add(new GridVertex(vertex.x, vertex.y, vertex.layer));
+        }
         SortGridVertexClockwise();
     }
 
@@ -64,8 +75,8 @@ public class GridPolygon : MonoBehaviour
             sumX += vertex.x;
             sumY += vertex.y;
         }
-        float avgX = sumX / gridVertexList.Count;
-        float avgY = sumY / gridVertexList.Count;
+        float avgX = sumX / (float)gridVertexList.Count;
+        float avgY = sumY / (float)gridVertexList.Count;
         _center = new GridVertex(avgX, avgY);
     }
 
@@ -86,13 +97,14 @@ public class GridPolygon : MonoBehaviour
         }
         if (x.x - center.x == 0 && y.x - center.x == 0)
         {
-            if (x.y - center.y >= 0 && y.y - center.y >= 0)
+            if (x.y - center.y >= 0 || y.y - center.y >= 0)
             {
                 return x.y > y.y ? 1 : 0;
             }
             return y.y > x.y ? 1 : 0;
         }
-        float det = ClockwiseDistance(x, y);
+        // float det = ClockwiseDistance(x, y);
+        float det = (x.x - center.x) * (y.y - center.y) - (y.x - center.x) * (x.y - center.y);
         if (det < 0)
         {
             return 1;
@@ -108,7 +120,8 @@ public class GridPolygon : MonoBehaviour
 
     public void SortGridVertexClockwise()
     {
-        gridVertexList.Sort((x, y) => ClockwiseComparison(x, y));
+        // gridVertexList = gridVertexList.Sort((x, y) => ClockwiseComparison(x, y)).ToList();
+        gridVertexList = gridVertexList.OrderBy(x => Mathf.Atan2(x.x - center.x, x.y - center.y)).ToList();
     }
 
     public GridVertex FindLineCenter(GridVertex v1, GridVertex v2)
@@ -119,6 +132,7 @@ public class GridPolygon : MonoBehaviour
     public List<GridPolygon> SplitToQuads()
     {
         List<GridPolygon> splitList = new List<GridPolygon>();
+        SortGridVertexClockwise();
         for (int i = 0; i < gridVertexList.Count; i++)
         {
             int indexNext = i + 1;
