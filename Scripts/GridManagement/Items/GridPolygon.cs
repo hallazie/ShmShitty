@@ -66,6 +66,41 @@ public class GridPolygon
         }
     }
 
+    public override int GetHashCode()
+    {
+        /*
+         only use inner grid vertex to calc hash
+         */
+
+        // TODO use round x, round y to calc hash
+
+        // unchecked
+        // {
+        //     int hash = 17;
+        //     foreach (GridVertex vertex in gridVertexList)
+        //     {
+        //         hash = hash * 23 + vertex.x.GetHashCode();
+        //         hash = hash * 23 + vertex.y.GetHashCode();
+        //     }
+        //     return hash;
+        // }
+        return base.GetHashCode();
+    }
+
+    public override bool Equals(object obj)
+    {
+        GridPolygon other = (GridPolygon)obj;
+        foreach (GridVertex vertex in gridVertexList)
+        {
+            GridVertex closest = CommonUtils.FindClosestVertexForTarget(other.gridVertexList, vertex);
+            if (vertex.x != closest.x || vertex.y != closest.y)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void RecalculateCenter()
     {
         float sumX = 0.0f;
@@ -120,20 +155,7 @@ public class GridPolygon
 
     public void SortGridVertexClockwise()
     {
-        // if (gridVertexList.Count > 3)
-        //    Debug.Log("before sort: " + string.Join("; ", gridVertexList.Select(obj => obj.ToString())));
-        //    Debug.Log("actan2: " + string.Join("; ", gridVertexList.Select(obj => Mathf.Atan2(obj.x - center.x, obj.y - center.y).ToString())));
-
-        // gridVertexList = gridVertexList.Sort((x, y) => ClockwiseComparison(x, y)).ToList();
         gridVertexList = gridVertexList.OrderBy(x => Mathf.Atan2(x.x - center.x, x.y - center.y)).ToList();
-
-        // if (gridVertexList.Count > 3)
-        //    Debug.Log("after sort: " + string.Join("; ", gridVertexList.Select(obj => obj.ToString())));
-    }
-
-    public GridVertex FindLineCenter(GridVertex v1, GridVertex v2)
-    {
-        return new GridVertex((v1.x + v2.x) / 2.0f, (v1.y + v2.y) / 2.0f);
     }
 
     public List<GridPolygon> SplitToQuads()
@@ -148,8 +170,8 @@ public class GridPolygon
                 indexNext = 0;
             if (i == 0)
                 indexPrev = gridVertexList.Count - 1;
-            GridVertex c1 = FindLineCenter(gridVertexList[indexPrev], gridVertexList[i]);
-            GridVertex c2 = FindLineCenter(gridVertexList[i], gridVertexList[indexNext]);
+            GridVertex c1 = CommonUtils.FindLineCenter(gridVertexList[indexPrev], gridVertexList[i]);
+            GridVertex c2 = CommonUtils.FindLineCenter(gridVertexList[i], gridVertexList[indexNext]);
             GridPolygon polygon = new GridPolygon(new List<GridVertex> { c1, c2, gridVertexList[i], centeroid });
             splitList.Add(polygon);
         }

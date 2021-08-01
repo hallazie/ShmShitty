@@ -34,17 +34,56 @@ public class GridModifier
         this.mergeThreshold = mergeThreshold;
     }
 
+    public void FiltInvalidQuads(List<GridPolygon> polygonList)
+    {
+
+    }
 
 
     public List<GridPolygon> SplitToQuads(List<GridPolygon> polygonList)
     {
         List<GridPolygon> splitedList = new List<GridPolygon>();
+        List<GridVertex> lineCenterList = new List<GridVertex>();
         foreach (GridPolygon polygon in polygonList)
         {
-            splitedList.AddRange(polygon.SplitToQuads());
+            for (int i = 0; i < polygon.gridVertexList.Count; i++)
+            {
+                int indexNext = i + 1;
+                int indexPrev = i - 1;
+                if (i == polygon.gridVertexList.Count - 1)
+                    indexNext = 0;
+                if (i == 0)
+                    indexPrev = polygon.gridVertexList.Count - 1;
+                GridVertex c1 = CommonUtils.FindLineCenter(polygon.gridVertexList[indexPrev], polygon.gridVertexList[i]);
+                GridVertex c2 = CommonUtils.FindLineCenter(polygon.gridVertexList[i], polygon.gridVertexList[indexNext]);
+                GridVertex l1 = null;
+                GridVertex l2 = null;
+                foreach (GridVertex v in lineCenterList)
+                {
+                    if (v.x == c1.x && v.y == c1.y)
+                    {
+                        l1 = v;
+                    }
+                    if (v.x == c2.x && v.y == c2.y)
+                    {
+                        l2 = v;
+                    }
+                }
+                if (l1 == null)
+                {
+                    lineCenterList.Add(c1);
+                    l1 = c1;
+                }
+                if (l2 == null)
+                {
+                    lineCenterList.Add(c2);
+                    l2 = c2;
+                }
+                GridPolygon splitedPolygon = new GridPolygon(new List<GridVertex> { l1, l2, polygon.gridVertexList[i], polygon.center });
+                splitedList.Add(splitedPolygon);
+            }
         }
         return splitedList;
-
     }
 
     private int IntersectVertexCountBetweenTwoPolygon(GridPolygon p1, GridPolygon p2)
@@ -71,7 +110,8 @@ public class GridModifier
         int siz1 = polygonList.Count;
         while (polygonList.Count > 0)
         {
-            GridPolygon head = polygonList[0];
+            int randomIndex = random.Next(0, polygonList.Count-1);
+            GridPolygon head = polygonList[randomIndex];
             polygonList.Remove(head);
             List<GridPolygon> polygonSubList = new List<GridPolygon>();
             if ((float)random.NextDouble() > this.mergeThreshold)
@@ -98,19 +138,18 @@ public class GridModifier
             polygonList.Remove(tail);
 
             float distance = CommonUtils.GridVertexEuclideanDistance(head.center, tail.center);
-            // Debug.Log("merging center: " + head.center.ToString() + " and " + tail.center.ToString() + " with distance=" + distance.ToString());
 
             HashSet<GridVertex> headVertex = new HashSet<GridVertex>(head.gridVertexList);
             HashSet<GridVertex> tailVertex = new HashSet<GridVertex>(tail.gridVertexList);
             headVertex.UnionWith(tailVertex);
             GridPolygon mergePolygon = new GridPolygon(new List<GridVertex>(headVertex));
-            if (!ValidNeighbor(mergePolygon))
+            if (!ValidNeighbor(mergePolygon) && false)
             {
                 mergedList.Add(head);
                 mergedList.Add(tail);
-                Debug.LogWarning("distance error while merging: ==========================");
-                Debug.LogWarning("head = " + string.Join("; ", head.gridVertexList.Select(x => x.ToString())) + " with");
-                Debug.LogWarning("tail = " + string.Join("; ", tail.gridVertexList.Select(x => x.ToString())));
+                // Debug.LogWarning("distance error while merging: ==========================");
+                // Debug.LogWarning("head = " + string.Join("; ", head.gridVertexList.Select(x => x.ToString())) + " with");
+                // Debug.LogWarning("tail = " + string.Join("; ", tail.gridVertexList.Select(x => x.ToString())));
             }
             else
             {
@@ -118,6 +157,17 @@ public class GridModifier
             }
         }
         int siz2 = mergedList.Count;
+
+        HashSet<GridVertex> vertexSet = new HashSet<GridVertex>();
+        foreach (GridPolygon polygon in mergedList)
+        {
+            foreach (GridVertex vertex in polygon.gridVertexList)
+            {
+                vertexSet.Add(vertex);
+            }
+        }
+        Debug.Log("grid-vertex hash set size: " + vertexSet.Count);
+
         Debug.Log("Grid modifier random merge finished threshold=" + mergeThreshold.ToString() + ", from size " + siz1.ToString() + " --> " + siz2.ToString());
         return mergedList;
     }

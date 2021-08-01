@@ -53,8 +53,7 @@ public class HexagonGridVertexSampler
         queue.Enqueue(new GridVertex(0.0f, 0.0f, 0));
         List<GridVertex> list = new List<GridVertex> { new GridVertex(0.0f, 0.0f, 0) };
         Traverse(queue, list);
-        return list;
+        return CommonUtils.Deduplicate(list);
 
     }
-
 }
