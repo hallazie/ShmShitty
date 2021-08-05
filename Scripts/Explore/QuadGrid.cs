@@ -5,12 +5,38 @@ using UnityEngine;
 
 public class QuadGrid : MonoBehaviour
 {
+    System.Random random;
 
     private List<GridPolygon> gridPolygonList = new List<GridPolygon>();
     private List<GridVertex> gridVertixList = new List<GridVertex>();
     private List<GridPolygon> quadPolygonList = new List<GridPolygon>();
     private List<GridPolygon> mergedPolygonList = new List<GridPolygon>();
     private List<GridPolygon> relaxPolygonList = new List<GridPolygon>();
+
+    private int layerNumber;
+    private float mergeProb;
+    private int learningEpoch;
+    private float learningRate;
+    private bool fixAlpha;
+
+    public List<GridPolygon> polygonList
+    {
+        get
+        {
+            return relaxPolygonList;
+        }
+    }
+
+    public QuadGrid(int layerNumber, float mergeProb, int learningEpoch, float learningRate, bool fixAlpha)
+    {
+        this.layerNumber = layerNumber;
+        this.mergeProb = mergeProb;
+        this.learningEpoch = learningEpoch;
+        this.learningRate = learningRate;
+        this.fixAlpha = fixAlpha;
+    }
+
+    private LineRenderer line;
     List<Color> colorList;
 
     HexagonGridVertexSampler gridVertexSampler;
@@ -18,17 +44,16 @@ public class QuadGrid : MonoBehaviour
     GridModifier gridModifier;
     GridRelaxation gridRelaxation;
 
-    public LineRenderer lineRenderer;
+    public Material lineMat;
 
     private void Start()
     {
 
-        lineRenderer = gameObject.AddComponent<LineRenderer>();
-
+        random = new System.Random();
         gridVertexSampler = new HexagonGridVertexSampler();
         gridGenerator = new GridGenerator();
-        gridModifier = new GridModifier(0.66f);
-        gridRelaxation = new GridRelaxation(0.1f, false);
+        gridModifier = new GridModifier();
+        gridRelaxation = new GridRelaxation(learningRate, fixAlpha);
 
         colorList = new List<Color>{
             Color.blue,
@@ -39,59 +64,42 @@ public class QuadGrid : MonoBehaviour
             Color.cyan
         };
 
-        lineRenderer.startColor = Color.gray;
-        lineRenderer.endColor = Color.gray;
-        lineRenderer.startWidth = 0.01f;
-        lineRenderer.endWidth = 0.01f;
-
         InitQuadGrid();
-
-        DrawGrid();
-
+        DrawGridByRenderer();
     }
 
-    private void DrawGrid()
+    private void DrawGridByRenderer()
     {
+        int lineCount = 0;
         foreach (GridPolygon polygon in relaxPolygonList)
         {
             for (int i = 0; i < polygon.gridVertexList.Count; i++)
             {
-                lineRenderer = GetComponent<LineRenderer>();
-                int j = (i != polygon.gridVertexList.Count - 1) ? i + 1 : 0;
-                GridVertex v1 = polygon.gridVertexList[i];
-                GridVertex v2 = polygon.gridVertexList[j];
-                lineRenderer.SetPosition(0, new Vector3(v1.x, 0, v1.y));
-                lineRenderer.SetPosition(1, new Vector3(v2.x, 0, v2.y));
+                int j = (i == polygon.gridVertexList.Count - 1) ? 0 : i + 1;
+                line = new GameObject("line" + lineCount).AddComponent<LineRenderer>();
+                line.material = new Material(Shader.Find("Sprites/Default"));
+                line.startColor = new Color32(65, 105, 225, 200);
+                line.endColor = new Color32(65, 105, 225, 200);
+                line.positionCount = 2;
+                line.startWidth = 0.025f;
+                line.endWidth = 0.025f;
+                line.useWorldSpace = true;
+                line.numCapVertices = 10;
+                line.SetPosition(0, polygon.gridVertexList[i].ToVector3());
+                line.SetPosition(1, polygon.gridVertexList[j].ToVector3());
+                line = null;
+                lineCount++;
             }
         }
     }
 
     void InitQuadGrid()
     {
-        gridVertixList = gridVertexSampler.Generate(10);
+        gridVertixList = gridVertexSampler.Generate(this.layerNumber);
         gridPolygonList = gridGenerator.GenerateDelaunayGrid(gridVertixList);
-        mergedPolygonList = gridModifier.RandomMerge(gridPolygonList, 0.75f);
+        mergedPolygonList = gridModifier.RandomMerge(gridPolygonList, this.mergeProb);
         quadPolygonList = gridModifier.SplitToQuads(mergedPolygonList);
-        relaxPolygonList = gridRelaxation.Relaxation(quadPolygonList, 100, 0.25f);
-    }
-
-    private void OnDrawGizmos()
-    {
-        int colorIndex = 0;
-        foreach (GridPolygon polygon in relaxPolygonList)
-        {
-            polygon.SortGridVertexClockwise();
-            for(int i = 0; i < polygon.gridVertexList.Count; i++)
-            {
-                int index1 = i;
-                int index2 = i == polygon.gridVertexList.Count - 1 ? 0 : i + 1;
-                GridVertex v1 = polygon.gridVertexList[index1];
-                GridVertex v2 = polygon.gridVertexList[index2];
-                // Gizmos.color = colorList[colorIndex % (colorList.Count - 1)];
-                Gizmos.DrawLine(v1.ToVector3(), v2.ToVector3());
-                colorIndex += 1;
-            }
-        }
+        relaxPolygonList = gridRelaxation.Relaxation(quadPolygonList, this.learningEpoch, this.learningRate);
     }
 
 }
