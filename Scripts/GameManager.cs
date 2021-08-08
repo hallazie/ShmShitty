@@ -10,10 +10,15 @@ public class GameManager : MonoBehaviour
     public GridInputManager gridInputManager;
     public VisualizeOperator visualizeOperator;
 
+    public void Start()
+    {
+        gridInputManager.OnMouseHover += visualizeOperator.HighlightHoverVertex;
+    }
+
 
     private void HoverQuadIndicateHandler()
     {
-        gridInputManager.OnMouseHover += visualizeOperator.HighlightHoverQuad;
+        gridInputManager.OnMouseHover += visualizeOperator.HighlightHoverVertex;
     }
 
 }

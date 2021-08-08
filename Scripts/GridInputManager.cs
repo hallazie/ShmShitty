@@ -13,9 +13,14 @@ public class GridInputManager : MonoBehaviour
 
     public LayerMask gridMask;
 
-    void Update()
+    public void Start()
     {
         
+    }
+
+    public void Update()
+    {
+        CheckMouseHoverEvent();
     }
 
     private void CheckMouseHoverEvent()
@@ -23,6 +28,7 @@ public class GridInputManager : MonoBehaviour
         if (!CheckInBuildMode())
         {
             var position = RaycastGround();
+            // Debug.Log("current position: " + (position == null) + " --" + gridMask.value.ToString());
             if (position != null)
             {
                 OnMouseHover?.Invoke(position.Value);
@@ -43,7 +49,7 @@ public class GridInputManager : MonoBehaviour
 
     private bool CheckInBuildMode()
     {
-        throw new NotImplementedException();
+        return false;
     }
 
     private void CheckMouseClickEvent()
