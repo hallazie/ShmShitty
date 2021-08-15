@@ -61,6 +61,37 @@ public class CommonUtils : MonoBehaviour
         return minVertex;
     }
 
+    public static List<GridVertex> GetSharedVertexBetweenPolygon(GridPolygon polygon1, GridPolygon polygon2)
+    {
+        List<GridVertex> sharedList = new List<GridVertex>();
+        foreach (GridVertex v1 in polygon1.gridVertexList)
+        {
+            foreach (GridVertex v2 in polygon2.gridVertexList)
+            {
+                if (v1.x == v2.x && v1.y == v2.y)
+                {
+                    sharedList.Add(v1);
+                }
+            }
+        }
+        return sharedList;
+    }
+
+    public static GridPolygon GetEncircledPolygonOfVertex(GridVertex vertex)
+    {
+        List<GridVertex> centerList = vertex.adjecentPolygonList.Select(obj => obj.center).ToList();
+        for (int i = 0; i < vertex.adjecentPolygonList.Count; i++)
+        {
+            int j = i == vertex.adjecentPolygonList.Count - 1 ? 0 : i + 1;
+            List<GridVertex> sharedList = GetSharedVertexBetweenPolygon(vertex.adjecentPolygonList[i], vertex.adjecentPolygonList[j]);
+            if (sharedList.Count != 2)
+                continue;
+            GridVertex lineCenter = FindLineCenter(sharedList[0], sharedList[1]);
+            centerList.Add(lineCenter);
+        }
+        return new GridPolygon(centerList);
+    }
+
 }
 
 

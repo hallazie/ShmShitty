@@ -8,22 +8,28 @@ public class GridVertex
 
     private float _x;
     private float _y;
+    private float _z;
     public int layer;
+    public int hexTraverseLayer;
+    public string type;
     private List<GridVertex> _adjecentVertexList = new List<GridVertex>();
     private List<GridPolygon> _adjecentPolygonList = new List<GridPolygon>();
+    private List<GridCorner> _cornerList = new List<GridCorner>();
 
-    public GridVertex(float x, float y, int layer=-1)
+    public GridVertex(float x, float y, float z=0, int layer=-1, string type="Grid Vertex")
     {
         this.x = x;
         this.y = y;
+        this.z = z;
         this.layer = layer;
+        this.type = type;
     }
 
     public float x
     {
         set
         {
-            this._x = Mathf.Round(value * 100f) / 100f;
+            this._x = Mathf.Round(value * 1000f) / 1000f;
         }
         get
         {
@@ -35,11 +41,23 @@ public class GridVertex
     {
         set
         {
-            this._y = Mathf.Round(value * 100f) / 100f;
+            this._y = Mathf.Round(value * 1000f) / 1000f;
         }
         get
         {
             return this._y;
+        }
+    }
+
+    public float z
+    {
+        set
+        {
+            this._z = Mathf.Round(value * 1000f) / 1000f;
+        }
+        get
+        {
+            return this._z;
         }
     }
 
@@ -50,21 +68,32 @@ public class GridVertex
             if(value.GetType() == typeof(List<GridPolygon>) && value.Count > 0)
             {
                 this._adjecentPolygonList = value;
-                ResortAdjecentPolygonList();
+                if (this._adjecentPolygonList.Count > 1)
+                    ResortAdjecentPolygonList();
             }
         }
         get
         {
+            if (this._adjecentPolygonList.Count > 1)
+                ResortAdjecentPolygonList();
             return this._adjecentPolygonList;
         }
     }
 
     private void ResortAdjecentPolygonList()
     {
-        this.adjecentPolygonList = this.adjecentPolygonList.OrderBy(x => Mathf.Atan2(x.center.x - this.x, x.center.y - this.y)).ToList();
+        try
+        {
+            this._adjecentPolygonList = this._adjecentPolygonList.OrderBy(x => Mathf.Atan2(x.center.x - this.x, x.center.y - this.y)).ToList();
+        }
+        catch (System.Exception)
+        {
+            Debug.LogError("sort polygon vertex error with polygon: " + string.Join("; ", this._adjecentPolygonList.Select(x => x.center.ToString())));
+            throw;
+        }
     }
 
-    public void AddToAdjcentList(GridPolygon polygon)
+    public void AddToAdjcentPolygonList(GridPolygon polygon)
     {
         bool unseen = true;
         foreach (GridPolygon adjecent in adjecentPolygonList)

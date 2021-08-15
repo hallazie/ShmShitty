@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class HexagonGridVertexSampler
 {
-    private int layer;
+    private int hexTraverseLayer;
     private float root3;
     private List<(float, float)> offsetList;
 
@@ -29,13 +29,14 @@ public class HexagonGridVertexSampler
             return;
         }
         GridVertex origin = queue.Dequeue();
-        if (origin.layer >= this.layer)
+        if (origin.hexTraverseLayer >= this.hexTraverseLayer)
         {
             return;
         }
         foreach (var offset in offsetList)
         {
-            GridVertex vertex = new GridVertex(origin.x + offset.Item1, origin.y + offset.Item2, origin.layer + 1);
+            GridVertex vertex = new GridVertex(origin.x + offset.Item1, origin.y + offset.Item2);
+            vertex.hexTraverseLayer = origin.hexTraverseLayer + 1;
             if (list.Contains(vertex))
             {
                 continue;
@@ -46,9 +47,9 @@ public class HexagonGridVertexSampler
         Traverse(queue, list);
     }
 
-    public List<GridVertex> Generate(int layer)
+    public List<GridVertex> Generate(int hexTraverseLayer)
     {
-        this.layer = layer;
+        this.hexTraverseLayer = hexTraverseLayer;
         Queue<GridVertex> queue = new Queue<GridVertex>();
         queue.Enqueue(new GridVertex(0.0f, 0.0f, 0));
         List<GridVertex> list = new List<GridVertex> { new GridVertex(0.0f, 0.0f, 0) };

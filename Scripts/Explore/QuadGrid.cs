@@ -13,11 +13,11 @@ public class QuadGrid : MonoBehaviour
     private List<GridPolygon> mergedPolygonList = new List<GridPolygon>();
     private List<GridPolygon> relaxPolygonList = new List<GridPolygon>();
 
-    private int layerNumber;
-    private float mergeProb;
-    private int learningEpoch;
-    private float learningRate;
-    private bool fixAlpha;
+    public int layerNumber;
+    public float mergeProb;
+    public int learningEpoch;
+    public float learningRate;
+    public bool fixAlpha;
 
     public List<GridPolygon> polygonList
     {
@@ -27,13 +27,12 @@ public class QuadGrid : MonoBehaviour
         }
     }
 
-    public QuadGrid(int layerNumber, float mergeProb, int learningEpoch, float learningRate, bool fixAlpha)
+    public List<GridVertex> vertexList
     {
-        this.layerNumber = layerNumber;
-        this.mergeProb = mergeProb;
-        this.learningEpoch = learningEpoch;
-        this.learningRate = learningRate;
-        this.fixAlpha = fixAlpha;
+        get
+        {
+            return gridVertixList;
+        }
     }
 
     private LineRenderer line;
@@ -93,13 +92,28 @@ public class QuadGrid : MonoBehaviour
         }
     }
 
-    void InitQuadGrid()
+    private void AddAdjecentPolygonToVertex()
+    {
+        foreach (GridVertex vertex in gridVertixList)
+        {
+            foreach (GridPolygon polygon in relaxPolygonList)
+            {
+                if (polygon.gridVertexList.Contains(vertex))
+                {
+                    vertex.AddToAdjcentPolygonList(polygon);
+                }
+            }
+        }
+    }
+
+    private void InitQuadGrid()
     {
         gridVertixList = gridVertexSampler.Generate(this.layerNumber);
         gridPolygonList = gridGenerator.GenerateDelaunayGrid(gridVertixList);
         mergedPolygonList = gridModifier.RandomMerge(gridPolygonList, this.mergeProb);
-        quadPolygonList = gridModifier.SplitToQuads(mergedPolygonList);
+        quadPolygonList = gridModifier.SplitToQuads(mergedPolygonList, gridVertixList);
         relaxPolygonList = gridRelaxation.Relaxation(quadPolygonList, this.learningEpoch, this.learningRate);
+        AddAdjecentPolygonToVertex();
     }
 
 }

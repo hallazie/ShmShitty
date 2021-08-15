@@ -40,7 +40,7 @@ public class GridModifier
     }
 
 
-    public List<GridPolygon> SplitToQuads(List<GridPolygon> polygonList)
+    public List<GridPolygon> SplitToQuads(List<GridPolygon> polygonList, List<GridVertex> vertexList)
     {
         List<GridPolygon> splitedList = new List<GridPolygon>();
         List<GridVertex> lineCenterList = new List<GridVertex>();
@@ -80,6 +80,14 @@ public class GridModifier
                     l2 = c2;
                 }
                 GridPolygon splitedPolygon = new GridPolygon(new List<GridVertex> { l1, l2, polygon.gridVertexList[i], polygon.center });
+                if (!vertexList.Contains(l1))
+                    vertexList.Add(l1);
+                if (!vertexList.Contains(l2))
+                    vertexList.Add(l2);
+                if (!vertexList.Contains(polygon.gridVertexList[i]))
+                    vertexList.Add(polygon.gridVertexList[i]);
+                if (!vertexList.Contains(polygon.center))
+                    vertexList.Add(polygon.center);
                 splitedList.Add(splitedPolygon);
             }
         }
@@ -147,9 +155,6 @@ public class GridModifier
             {
                 mergedList.Add(head);
                 mergedList.Add(tail);
-                // Debug.LogWarning("distance error while merging: ==========================");
-                // Debug.LogWarning("head = " + string.Join("; ", head.gridVertexList.Select(x => x.ToString())) + " with");
-                // Debug.LogWarning("tail = " + string.Join("; ", tail.gridVertexList.Select(x => x.ToString())));
             }
             else
             {
