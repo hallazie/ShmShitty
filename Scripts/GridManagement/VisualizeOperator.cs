@@ -17,15 +17,6 @@ public class VisualizeOperator : MonoBehaviour
         // quadGrid = GetComponent<QuadGrid>();
     }
 
-    public void OnDrawGizmos()
-    {
-        return;
-        foreach (GridVertex vertex in quadGrid.vertexList)
-        {
-            Gizmos.DrawSphere(new Vector3(vertex.x, 0, vertex.y), 0.1f);
-        }
-    }
-
     private void MakeHighlightQuad(GridVertex vertex)
     {
 

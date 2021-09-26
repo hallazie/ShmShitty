@@ -9,16 +9,23 @@ public class GameManager : MonoBehaviour
 
     public GridInputManager gridInputManager;
     public VisualizeOperator visualizeOperator;
+    public SimplePlacingHandler simplePlacingHandler;
 
     public void Start()
+    {
+        InitHoverQuadIndicateHandler();
+        InitPlacementHandler();
+    }
+
+
+    private void InitHoverQuadIndicateHandler()
     {
         gridInputManager.OnMouseHover += visualizeOperator.HighlightHoverVertex;
     }
 
-
-    private void HoverQuadIndicateHandler()
+    private void InitPlacementHandler()
     {
-        gridInputManager.OnMouseHover += visualizeOperator.HighlightHoverVertex;
+        gridInputManager.OnMouseClick += simplePlacingHandler.SimplePlaceHouse;
     }
 
 }

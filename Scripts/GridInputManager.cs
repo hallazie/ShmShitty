@@ -15,6 +15,7 @@ public class GridInputManager : MonoBehaviour
 
     public LayerMask gridMask;
     public LayerMask buidlingBlockMask;
+    public bool buildingMode = false;
 
     public void Start()
     {
@@ -52,12 +53,13 @@ public class GridInputManager : MonoBehaviour
 
     private bool CheckInBuildMode()
     {
-        return false;
+        return buildingMode;
     }
 
     private void CheckMouseClickEvent()
     {
-        if (CheckInBuildMode() && Input.GetMouseButton(0) && EventSystem.current.IsPointerOverGameObject() == false)
+        // if (CheckInBuildMode() && Input.GetMouseButton(0) && EventSystem.current.IsPointerOverGameObject() == false)
+        if (CheckInBuildMode() && Input.GetMouseButton(0))
         {
             var position = RaycastAtMask(buidlingBlockMask);
             if (position != null)
