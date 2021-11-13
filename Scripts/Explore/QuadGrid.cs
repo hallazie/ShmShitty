@@ -72,9 +72,9 @@ public class QuadGrid : MonoBehaviour
         int lineCount = 0;
         foreach (GridPolygon polygon in relaxPolygonList)
         {
-            for (int i = 0; i < polygon.gridVertexList.Count; i++)
+            for (int i = 0; i < polygon.lowerGridVertexList.Count; i++)
             {
-                int j = (i == polygon.gridVertexList.Count - 1) ? 0 : i + 1;
+                int j = (i == polygon.lowerGridVertexList.Count - 1) ? 0 : i + 1;
                 line = new GameObject("line" + lineCount).AddComponent<LineRenderer>();
                 line.material = new Material(Shader.Find("Sprites/Default"));
                 line.startColor = new Color32(65, 105, 225, 200);
@@ -84,8 +84,8 @@ public class QuadGrid : MonoBehaviour
                 line.endWidth = 0.025f;
                 line.useWorldSpace = true;
                 line.numCapVertices = 10;
-                line.SetPosition(0, polygon.gridVertexList[i].ToVector3());
-                line.SetPosition(1, polygon.gridVertexList[j].ToVector3());
+                line.SetPosition(0, polygon.lowerGridVertexList[i].ToVector3());
+                line.SetPosition(1, polygon.lowerGridVertexList[j].ToVector3());
                 line = null;
                 lineCount++;
             }
@@ -98,7 +98,7 @@ public class QuadGrid : MonoBehaviour
         {
             foreach (GridPolygon polygon in relaxPolygonList)
             {
-                if (polygon.gridVertexList.Contains(vertex))
+                if (polygon.lowerGridVertexList.Contains(vertex))
                 {
                     vertex.AddToAdjcentPolygonList(polygon);
                 }

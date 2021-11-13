@@ -4,26 +4,32 @@ using System.Linq;
 using UnityEngine;
 
 public class GridPolygon
+    /*
+     the actual polygon
+     */
 {
-
-    public List<GridVertex> gridVertexList = new List<GridVertex>();
+    public List<GridVertex> lowerGridVertexList = new List<GridVertex>();
+    public List<GridVertex> upperGridVertexList = new List<GridVertex>();
     public string type;
+    private Collider collider;
+    private Renderer renderer;
 
+    private int _floor;
     private GridVertex _center = null;
     private float _sideLength;
 
     public GridPolygon(List<GridVertex> vertexList)
     {
-        gridVertexList = vertexList;
+        lowerGridVertexList = vertexList;
         SortGridVertexClockwise();
     }
 
     public GridPolygon(GridPolygon other)
     {
-        this.gridVertexList.Clear();
-        foreach (GridVertex vertex in other.gridVertexList)
+        this.lowerGridVertexList.Clear();
+        foreach (GridVertex vertex in other.lowerGridVertexList)
         {
-            this.gridVertexList.Add(new GridVertex(vertex.x, vertex.y, vertex.layer));
+            this.lowerGridVertexList.Add(new GridVertex(vertex.x, vertex.y, vertex.layer));
         }
         SortGridVertexClockwise();
     }
@@ -44,18 +50,30 @@ public class GridPolygon
         }
     }
 
+    public int floor
+    {
+        get
+        {
+            return this._floor;
+        }
+        set
+        {
+            this._floor = value;
+        }
+    }
+
     public float sideLength
     {
         get
         {
-            if(_sideLength == 0.0f && gridVertexList.Count >= 2)
+            if(_sideLength == 0.0f && lowerGridVertexList.Count >= 2)
             {
-                for(int i=0; i<gridVertexList.Count; i++)
+                for(int i=0; i<lowerGridVertexList.Count; i++)
                 {
                     int indexNext = i + 1;
-                    if (i == gridVertexList.Count - 1)
+                    if (i == lowerGridVertexList.Count - 1)
                         indexNext = 0;
-                    _sideLength += CommonUtils.GridVertexEuclideanDistance(gridVertexList[i], gridVertexList[indexNext]);
+                    _sideLength += CommonUtils.GridVertexEuclideanDistance(lowerGridVertexList[i], lowerGridVertexList[indexNext]);
                 }
             }
             return _sideLength;
@@ -90,9 +108,9 @@ public class GridPolygon
     public override bool Equals(object obj)
     {
         GridPolygon other = (GridPolygon)obj;
-        foreach (GridVertex vertex in gridVertexList)
+        foreach (GridVertex vertex in lowerGridVertexList)
         {
-            GridVertex closest = CommonUtils.FindClosestVertexForTarget(other.gridVertexList, vertex);
+            GridVertex closest = CommonUtils.FindClosestVertexForTarget(other.lowerGridVertexList, vertex);
             if (vertex.x != closest.x || vertex.y != closest.y)
             {
                 return false;
@@ -105,13 +123,13 @@ public class GridPolygon
     {
         float sumX = 0.0f;
         float sumY = 0.0f;
-        foreach (GridVertex vertex in gridVertexList)
+        foreach (GridVertex vertex in lowerGridVertexList)
         {
             sumX += vertex.x;
             sumY += vertex.y;
         }
-        float avgX = sumX / (float)gridVertexList.Count;
-        float avgY = sumY / (float)gridVertexList.Count;
+        float avgX = sumX / (float)lowerGridVertexList.Count;
+        float avgY = sumY / (float)lowerGridVertexList.Count;
         _center = new GridVertex(avgX, avgY);
     }
 
@@ -155,24 +173,24 @@ public class GridPolygon
 
     public void SortGridVertexClockwise()
     {
-        gridVertexList = gridVertexList.OrderBy(x => Mathf.Atan2(x.x - center.x, x.y - center.y)).ToList();
+        lowerGridVertexList = lowerGridVertexList.OrderBy(x => Mathf.Atan2(x.x - center.x, x.y - center.y)).ToList();
     }
 
     public List<GridPolygon> SplitToQuads()
     {
         GridVertex centeroid = new GridVertex(this.center);
         List<GridPolygon> splitList = new List<GridPolygon>();
-        for (int i = 0; i < gridVertexList.Count; i++)
+        for (int i = 0; i < lowerGridVertexList.Count; i++)
         {
             int indexNext = i + 1;
             int indexPrev = i - 1;
-            if (i == gridVertexList.Count - 1)
+            if (i == lowerGridVertexList.Count - 1)
                 indexNext = 0;
             if (i == 0)
-                indexPrev = gridVertexList.Count - 1;
-            GridVertex c1 = CommonUtils.FindLineCenter(gridVertexList[indexPrev], gridVertexList[i]);
-            GridVertex c2 = CommonUtils.FindLineCenter(gridVertexList[i], gridVertexList[indexNext]);
-            GridPolygon polygon = new GridPolygon(new List<GridVertex> { c1, c2, gridVertexList[i], centeroid });
+                indexPrev = lowerGridVertexList.Count - 1;
+            GridVertex c1 = CommonUtils.FindLineCenter(lowerGridVertexList[indexPrev], lowerGridVertexList[i]);
+            GridVertex c2 = CommonUtils.FindLineCenter(lowerGridVertexList[i], lowerGridVertexList[indexNext]);
+            GridPolygon polygon = new GridPolygon(new List<GridVertex> { c1, c2, lowerGridVertexList[i], centeroid });
             splitList.Add(polygon);
         }
         return splitList;

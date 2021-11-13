@@ -4,6 +4,11 @@ using System.Linq;
 using UnityEngine;
 
 public class GridVertex
+
+    /*
+     center of a polygon
+     */
+
 {
 
     private float _x;

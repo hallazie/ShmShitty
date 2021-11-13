@@ -46,16 +46,16 @@ public class GridModifier
         List<GridVertex> lineCenterList = new List<GridVertex>();
         foreach (GridPolygon polygon in polygonList)
         {
-            for (int i = 0; i < polygon.gridVertexList.Count; i++)
+            for (int i = 0; i < polygon.lowerGridVertexList.Count; i++)
             {
                 int indexNext = i + 1;
                 int indexPrev = i - 1;
-                if (i == polygon.gridVertexList.Count - 1)
+                if (i == polygon.lowerGridVertexList.Count - 1)
                     indexNext = 0;
                 if (i == 0)
-                    indexPrev = polygon.gridVertexList.Count - 1;
-                GridVertex c1 = CommonUtils.FindLineCenter(polygon.gridVertexList[indexPrev], polygon.gridVertexList[i]);
-                GridVertex c2 = CommonUtils.FindLineCenter(polygon.gridVertexList[i], polygon.gridVertexList[indexNext]);
+                    indexPrev = polygon.lowerGridVertexList.Count - 1;
+                GridVertex c1 = CommonUtils.FindLineCenter(polygon.lowerGridVertexList[indexPrev], polygon.lowerGridVertexList[i]);
+                GridVertex c2 = CommonUtils.FindLineCenter(polygon.lowerGridVertexList[i], polygon.lowerGridVertexList[indexNext]);
                 GridVertex l1 = null;
                 GridVertex l2 = null;
                 foreach (GridVertex v in lineCenterList)
@@ -79,13 +79,13 @@ public class GridModifier
                     lineCenterList.Add(c2);
                     l2 = c2;
                 }
-                GridPolygon splitedPolygon = new GridPolygon(new List<GridVertex> { l1, l2, polygon.gridVertexList[i], polygon.center });
+                GridPolygon splitedPolygon = new GridPolygon(new List<GridVertex> { l1, l2, polygon.lowerGridVertexList[i], polygon.center });
                 if (!vertexList.Contains(l1))
                     vertexList.Add(l1);
                 if (!vertexList.Contains(l2))
                     vertexList.Add(l2);
-                if (!vertexList.Contains(polygon.gridVertexList[i]))
-                    vertexList.Add(polygon.gridVertexList[i]);
+                if (!vertexList.Contains(polygon.lowerGridVertexList[i]))
+                    vertexList.Add(polygon.lowerGridVertexList[i]);
                 if (!vertexList.Contains(polygon.center))
                     vertexList.Add(polygon.center);
                 splitedList.Add(splitedPolygon);
@@ -97,9 +97,9 @@ public class GridModifier
     private int IntersectVertexCountBetweenTwoPolygon(GridPolygon p1, GridPolygon p2)
     {
         int intersectCount = 0;
-        foreach (GridVertex v1 in p1.gridVertexList)
+        foreach (GridVertex v1 in p1.lowerGridVertexList)
         {
-            foreach (GridVertex v2 in p2.gridVertexList)
+            foreach (GridVertex v2 in p2.lowerGridVertexList)
             {
                 if (v1.x == v2.x && v1.y == v2.y)
                 {
@@ -147,8 +147,8 @@ public class GridModifier
 
             float distance = CommonUtils.GridVertexEuclideanDistance(head.center, tail.center);
 
-            HashSet<GridVertex> headVertex = new HashSet<GridVertex>(head.gridVertexList);
-            HashSet<GridVertex> tailVertex = new HashSet<GridVertex>(tail.gridVertexList);
+            HashSet<GridVertex> headVertex = new HashSet<GridVertex>(head.lowerGridVertexList);
+            HashSet<GridVertex> tailVertex = new HashSet<GridVertex>(tail.lowerGridVertexList);
             headVertex.UnionWith(tailVertex);
             GridPolygon mergePolygon = new GridPolygon(new List<GridVertex>(headVertex));
             if (!ValidNeighbor(mergePolygon) && false)
@@ -166,7 +166,7 @@ public class GridModifier
         HashSet<GridVertex> vertexSet = new HashSet<GridVertex>();
         foreach (GridPolygon polygon in mergedList)
         {
-            foreach (GridVertex vertex in polygon.gridVertexList)
+            foreach (GridVertex vertex in polygon.lowerGridVertexList)
             {
                 vertexSet.Add(vertex);
             }
@@ -180,14 +180,14 @@ public class GridModifier
     private bool ValidNeighbor(GridPolygon mergePolygon)
     {
         List<float> adjecentDistanceList = new List<float>();
-        for(int i = 0; i < mergePolygon.gridVertexList.Count; i++)
+        for(int i = 0; i < mergePolygon.lowerGridVertexList.Count; i++)
         {
             int next = i + 1;
-            if (i == mergePolygon.gridVertexList.Count - 1)
+            if (i == mergePolygon.lowerGridVertexList.Count - 1)
             {
                 next = 0;
             }
-            adjecentDistanceList.Add(CommonUtils.GridVertexEuclideanDistance(mergePolygon.gridVertexList[i], mergePolygon.gridVertexList[next]));
+            adjecentDistanceList.Add(CommonUtils.GridVertexEuclideanDistance(mergePolygon.lowerGridVertexList[i], mergePolygon.lowerGridVertexList[next]));
         }
         if(adjecentDistanceList.Count < 2)
         {

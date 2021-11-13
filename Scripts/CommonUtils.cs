@@ -64,9 +64,9 @@ public class CommonUtils : MonoBehaviour
     public static List<GridVertex> GetSharedVertexBetweenPolygon(GridPolygon polygon1, GridPolygon polygon2)
     {
         List<GridVertex> sharedList = new List<GridVertex>();
-        foreach (GridVertex v1 in polygon1.gridVertexList)
+        foreach (GridVertex v1 in polygon1.lowerGridVertexList)
         {
-            foreach (GridVertex v2 in polygon2.gridVertexList)
+            foreach (GridVertex v2 in polygon2.lowerGridVertexList)
             {
                 if (v1.x == v2.x && v1.y == v2.y)
                 {

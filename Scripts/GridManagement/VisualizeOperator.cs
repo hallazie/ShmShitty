@@ -29,9 +29,9 @@ public class VisualizeOperator : MonoBehaviour
         // Debug.Log("adjecent polygons: " + string.Join("; ", vertex.adjecentPolygonList.Select(obj => obj.center.ToString())));
 
         GridPolygon virtualPolygon = CommonUtils.GetEncircledPolygonOfVertex(vertex);
-        for (int i = 0; i < virtualPolygon.gridVertexList.Count; i++)
+        for (int i = 0; i < virtualPolygon.lowerGridVertexList.Count; i++)
         {
-            int j = (i == virtualPolygon.gridVertexList.Count - 1) ? 0 : i + 1;
+            int j = (i == virtualPolygon.lowerGridVertexList.Count - 1) ? 0 : i + 1;
             line = new GameObject("virtualPolygonLine").AddComponent<LineRenderer>();
             line.tag = "VirtualPolygonLine";
             line.material = new Material(Shader.Find("Sprites/Default"));
@@ -42,8 +42,8 @@ public class VisualizeOperator : MonoBehaviour
             line.endWidth = 0.025f;
             line.useWorldSpace = true;
             line.numCapVertices = 10;
-            line.SetPosition(0, virtualPolygon.gridVertexList[i].ToVector3());
-            line.SetPosition(1, virtualPolygon.gridVertexList[j].ToVector3());
+            line.SetPosition(0, virtualPolygon.lowerGridVertexList[i].ToVector3());
+            line.SetPosition(1, virtualPolygon.lowerGridVertexList[j].ToVector3());
             line = null;
         }
     }

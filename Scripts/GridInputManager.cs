@@ -16,6 +16,7 @@ public class GridInputManager : MonoBehaviour
     public LayerMask gridMask;
     public LayerMask buidlingBlockMask;
     public bool buildingMode = false;
+    public bool alwaysShowHover = true;
 
     public void Start()
     {
@@ -30,7 +31,7 @@ public class GridInputManager : MonoBehaviour
 
     private void CheckMouseHoverEvent()
     {
-        if (!CheckInBuildMode())
+        if (!CheckInBuildMode() || alwaysShowHover)
         {
             var position = RaycastAtMask(gridMask);
             if (position != null)

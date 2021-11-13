@@ -24,11 +24,11 @@ public class GridRelaxation
          first derivative for the loss function
          */
 
-        if (polygon.gridVertexList.Count != 4)
+        if (polygon.lowerGridVertexList.Count != 4)
             return null;
         float radius = (polygon.sideLength / 8.0f ) * Mathf.Sqrt(2);
-        float derive = 2 * radius * Mathf.Sin(alpha * (polygon.gridVertexList[0].x - polygon.gridVertexList[1].y - polygon.gridVertexList[2].x + polygon.gridVertexList[3].y))
-            + 2 * radius * Mathf.Cos(alpha * (-polygon.gridVertexList[0].y - polygon.gridVertexList[1].x + polygon.gridVertexList[2].y + polygon.gridVertexList[3].x));
+        float derive = 2 * radius * Mathf.Sin(alpha * (polygon.lowerGridVertexList[0].x - polygon.lowerGridVertexList[1].y - polygon.lowerGridVertexList[2].x + polygon.lowerGridVertexList[3].y))
+            + 2 * radius * Mathf.Cos(alpha * (-polygon.lowerGridVertexList[0].y - polygon.lowerGridVertexList[1].x + polygon.lowerGridVertexList[2].y + polygon.lowerGridVertexList[3].x));
         return derive;
     }
 
@@ -38,19 +38,19 @@ public class GridRelaxation
          second derivative for the loss function
          */
 
-        if (polygon.gridVertexList.Count != 4)
+        if (polygon.lowerGridVertexList.Count != 4)
             return 0;
-        float derive = 2 * radius * Mathf.Cos(alpha * (polygon.gridVertexList[0].x - polygon.gridVertexList[1].y - polygon.gridVertexList[2].x + polygon.gridVertexList[3].y))
-            + 2 * radius * Mathf.Sin(alpha * (polygon.gridVertexList[0].y + polygon.gridVertexList[1].x - polygon.gridVertexList[2].y - polygon.gridVertexList[3].x));
+        float derive = 2 * radius * Mathf.Cos(alpha * (polygon.lowerGridVertexList[0].x - polygon.lowerGridVertexList[1].y - polygon.lowerGridVertexList[2].x + polygon.lowerGridVertexList[3].y))
+            + 2 * radius * Mathf.Sin(alpha * (polygon.lowerGridVertexList[0].y + polygon.lowerGridVertexList[1].x - polygon.lowerGridVertexList[2].y - polygon.lowerGridVertexList[3].x));
         return derive;
     }
 
     public float ArgumentMinAlpha(GridPolygon polygon, float radius)
     {
-        if (polygon.gridVertexList.Count != 4)
+        if (polygon.lowerGridVertexList.Count != 4)
             return 0;
-        float numerator = (float)(polygon.gridVertexList[0].y + polygon.gridVertexList[1].x - polygon.gridVertexList[2].y - polygon.gridVertexList[3].x);
-        float denominator = (float)(polygon.gridVertexList[0].x - polygon.gridVertexList[1].y - polygon.gridVertexList[2].x + polygon.gridVertexList[3].y);
+        float numerator = (float)(polygon.lowerGridVertexList[0].y + polygon.lowerGridVertexList[1].x - polygon.lowerGridVertexList[2].y - polygon.lowerGridVertexList[3].x);
+        float denominator = (float)(polygon.lowerGridVertexList[0].x - polygon.lowerGridVertexList[1].y - polygon.lowerGridVertexList[2].x + polygon.lowerGridVertexList[3].y);
         if (denominator == 0)
         {
             return 0;
@@ -75,12 +75,12 @@ public class GridRelaxation
 
     private List<GridVertex> AlignToVertex(GridPolygon polygon, List<GridVertex> quadList)
     {
-        if(polygon.gridVertexList.Count < 1)
+        if(polygon.lowerGridVertexList.Count < 1)
         {
-            return polygon.gridVertexList;
+            return polygon.lowerGridVertexList;
         }
         Hashtable closestTable = new Hashtable();
-        foreach (GridVertex vertex in polygon.gridVertexList)
+        foreach (GridVertex vertex in polygon.lowerGridVertexList)
         {
             GridVertex minVertex = CommonUtils.FindClosestVertexForTarget(quadList, vertex);
             closestTable[vertex] = minVertex;
@@ -88,7 +88,7 @@ public class GridRelaxation
         if(closestTable.Count == 4)
         {
             List<GridVertex> alignedVertexList = new List<GridVertex>();
-            foreach (GridVertex vertex in polygon.gridVertexList)
+            foreach (GridVertex vertex in polygon.lowerGridVertexList)
             {
                 alignedVertexList.Add((GridVertex)closestTable[vertex]);
             }
@@ -96,7 +96,7 @@ public class GridRelaxation
         }
         else
         {
-            return polygon.gridVertexList;
+            return polygon.lowerGridVertexList;
         }
     }
 
@@ -105,17 +105,17 @@ public class GridRelaxation
         Hashtable differentiate = new Hashtable();
         foreach (GridPolygon polygon in polygonList)
         {
-            foreach (GridVertex vertex in polygon.gridVertexList)
+            foreach (GridVertex vertex in polygon.lowerGridVertexList)
             {
                 differentiate[vertex] = new List<float>();
             }
         }
         foreach (GridPolygon polygon in polygonList)
         {
-            if (polygon.gridVertexList.Count < 1)
+            if (polygon.lowerGridVertexList.Count < 1)
                 continue;
             GridVertex center = polygon.center;
-            float radius = CommonUtils.GridVertexEuclideanDistance(CommonUtils.FindClosestVertexForTarget(polygon.gridVertexList, center), center);
+            float radius = CommonUtils.GridVertexEuclideanDistance(CommonUtils.FindClosestVertexForTarget(polygon.lowerGridVertexList, center), center);
             float alpha;
             if (!this.alphaCache.Contains(polygon) || !this.alphaFix)
             {
@@ -126,15 +126,15 @@ public class GridRelaxation
             // Debug.Log("current alpha=" + alpha.ToString());
             List<GridVertex> cornerCoordinateList = CornerCoordinates(center, alpha, radius);
             List<GridVertex> alignedList = AlignToVertex(polygon, cornerCoordinateList);
-            for(int i = 0; i < polygon.gridVertexList.Count; i++)
+            for(int i = 0; i < polygon.lowerGridVertexList.Count; i++)
             {
-                float xDiff = (alignedList[i].x - polygon.gridVertexList[i].x) * this.learningRate;
-                float yDiff = (alignedList[i].y - polygon.gridVertexList[i].y) * this.learningRate;
+                float xDiff = (alignedList[i].x - polygon.lowerGridVertexList[i].x) * this.learningRate;
+                float yDiff = (alignedList[i].y - polygon.lowerGridVertexList[i].y) * this.learningRate;
                 // Debug.Log("total sum diff: " + xDiff.ToString() + ", " + yDiff.ToString());
-                var v = (List<float>)differentiate[polygon.gridVertexList[i]];
+                var v = (List<float>)differentiate[polygon.lowerGridVertexList[i]];
                 v.Add(xDiff);
                 v.Add(yDiff);
-                differentiate[polygon.gridVertexList[i]] = v;
+                differentiate[polygon.lowerGridVertexList[i]] = v;
             }
         }
         Hashtable averageDifferentiate = new Hashtable();
@@ -161,17 +161,17 @@ public class GridRelaxation
         float totalLoss = 0;
         foreach (GridPolygon polygon in polygonList)
         {
-            for(int i = 0; i < polygon.gridVertexList.Count; i++)
+            for(int i = 0; i < polygon.lowerGridVertexList.Count; i++)
             {
-                if (!averageDifferentiate.ContainsKey(polygon.gridVertexList[i]))
+                if (!averageDifferentiate.ContainsKey(polygon.lowerGridVertexList[i]))
                 {
                     continue;
                 }
-                List<float> avg = (List<float>)averageDifferentiate[polygon.gridVertexList[i]];
+                List<float> avg = (List<float>)averageDifferentiate[polygon.lowerGridVertexList[i]];
                 if (avg.Count != 2)
                     continue;
-                polygon.gridVertexList[i].x += avg[0];
-                polygon.gridVertexList[i].y += avg[1];
+                polygon.lowerGridVertexList[i].x += avg[0];
+                polygon.lowerGridVertexList[i].y += avg[1];
                 totalLoss += avg[0];
                 totalLoss += avg[1];
             }
@@ -189,7 +189,7 @@ public class GridRelaxation
         for(int ep = 0; ep < epoches; ep++)
         {
             RelaxSingleStepUpdate(polygonList, ep);
-            int vertexNum = polygonList.Sum(obj => obj.gridVertexList.Count);
+            int vertexNum = polygonList.Sum(obj => obj.lowerGridVertexList.Count);
             Debug.Log("polygon list size=" + polygonList.Count.ToString() + " with total vertex num=" + vertexNum);
         }
         return polygonList;
