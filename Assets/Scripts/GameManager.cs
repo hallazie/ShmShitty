@@ -7,8 +7,8 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
 
-    public GridInputManager gridInputManager;
-    public VisualizeOperator visualizeOperator;
+    public GraphInputManager graphInputManager;
+    public GraphVisualizeOperator graphVisualizeOperator;
     public SimplePlacingHandler simplePlacingHandler;
 
     public void Start()
@@ -20,12 +20,12 @@ public class GameManager : MonoBehaviour
 
     private void InitHoverQuadIndicateHandler()
     {
-        gridInputManager.OnMouseHover += visualizeOperator.HighlightHoverVertex;
+        graphInputManager.OnMouseHover += graphVisualizeOperator.HighlightHoverVertex;
     }
 
     private void InitPlacementHandler()
     {
-        gridInputManager.OnMouseClick += simplePlacingHandler.SimplePlaceHouse;
+        graphInputManager.OnMouseClick += simplePlacingHandler.SimplePlaceHouse;
     }
 
 }
