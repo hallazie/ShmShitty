@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class CornerElement : MonoBehaviour
 {
+
+    private List<GridElement> ownerGridList;
+    private Vector3 coord;
+
     // Start is called before the first frame update
     void Start()
     {

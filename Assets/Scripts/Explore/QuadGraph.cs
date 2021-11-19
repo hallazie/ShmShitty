@@ -72,9 +72,9 @@ public class QuadGraph : MonoBehaviour
         int lineCount = 0;
         foreach (GraphPolygon polygon in relaxPolygonList)
         {
-            for (int i = 0; i < polygon.graphVertexList.Count; i++)
+            for (int i = 0; i < polygon.cornerGraphVertexList.Count; i++)
             {
-                int j = (i == polygon.graphVertexList.Count - 1) ? 0 : i + 1;
+                int j = (i == polygon.cornerGraphVertexList.Count - 1) ? 0 : i + 1;
                 line = new GameObject("line" + lineCount).AddComponent<LineRenderer>();
                 line.material = new Material(Shader.Find("Sprites/Default"));
                 line.startColor = new Color32(65, 105, 225, 200);
@@ -84,8 +84,8 @@ public class QuadGraph : MonoBehaviour
                 line.endWidth = 0.025f;
                 line.useWorldSpace = true;
                 line.numCapVertices = 10;
-                line.SetPosition(0, polygon.graphVertexList[i].ToVector3());
-                line.SetPosition(1, polygon.graphVertexList[j].ToVector3());
+                line.SetPosition(0, polygon.cornerGraphVertexList[i].ToVector3());
+                line.SetPosition(1, polygon.cornerGraphVertexList[j].ToVector3());
                 line = null;
                 lineCount++;
             }
@@ -98,7 +98,7 @@ public class QuadGraph : MonoBehaviour
         {
             foreach (GraphPolygon polygon in relaxPolygonList)
             {
-                if (polygon.graphVertexList.Contains(vertex))
+                if (polygon.cornerGraphVertexList.Contains(vertex))
                 {
                     vertex.AddToAdjcentPolygonList(polygon);
                 }

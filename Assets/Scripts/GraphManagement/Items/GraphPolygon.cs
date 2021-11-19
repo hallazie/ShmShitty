@@ -8,10 +8,8 @@ public class GraphPolygon
      the actual polygon
      */
 {
-    public List<GraphVertex> graphVertexList = new List<GraphVertex>();
+    public List<GraphVertex> cornerGraphVertexList = new List<GraphVertex>();
     public string type;
-    private Collider collider;
-    private Renderer renderer;
 
     private int _floor;
     private GraphVertex _center = null;
@@ -19,16 +17,16 @@ public class GraphPolygon
 
     public GraphPolygon(List<GraphVertex> vertexList)
     {
-        graphVertexList = vertexList;
+        cornerGraphVertexList = vertexList;
         SortGraphVertexClockwise();
     }
 
     public GraphPolygon(GraphPolygon other)
     {
-        this.graphVertexList.Clear();
-        foreach (GraphVertex vertex in other.graphVertexList)
+        this.cornerGraphVertexList.Clear();
+        foreach (GraphVertex vertex in other.cornerGraphVertexList)
         {
-            this.graphVertexList.Add(new GraphVertex(vertex.x, vertex.y, vertex.layer));
+            this.cornerGraphVertexList.Add(new GraphVertex(vertex.x, vertex.y, vertex.layer));
         }
         SortGraphVertexClockwise();
     }
@@ -65,14 +63,14 @@ public class GraphPolygon
     {
         get
         {
-            if(_sideLength == 0.0f && graphVertexList.Count >= 2)
+            if(_sideLength == 0.0f && cornerGraphVertexList.Count >= 2)
             {
-                for(int i=0; i<graphVertexList.Count; i++)
+                for(int i=0; i<cornerGraphVertexList.Count; i++)
                 {
                     int indexNext = i + 1;
-                    if (i == graphVertexList.Count - 1)
+                    if (i == cornerGraphVertexList.Count - 1)
                         indexNext = 0;
-                    _sideLength += CommonUtils.GraphVertexEuclideanDistance(graphVertexList[i], graphVertexList[indexNext]);
+                    _sideLength += CommonUtils.GraphVertexEuclideanDistance(cornerGraphVertexList[i], cornerGraphVertexList[indexNext]);
                 }
             }
             return _sideLength;
@@ -107,9 +105,9 @@ public class GraphPolygon
     public override bool Equals(object obj)
     {
         GraphPolygon other = (GraphPolygon)obj;
-        foreach (GraphVertex vertex in graphVertexList)
+        foreach (GraphVertex vertex in cornerGraphVertexList)
         {
-            GraphVertex closest = CommonUtils.FindClosestVertexForTarget(other.graphVertexList, vertex);
+            GraphVertex closest = CommonUtils.FindClosestVertexForTarget(other.cornerGraphVertexList, vertex);
             if (vertex.x != closest.x || vertex.y != closest.y)
             {
                 return false;
@@ -122,13 +120,13 @@ public class GraphPolygon
     {
         float sumX = 0.0f;
         float sumY = 0.0f;
-        foreach (GraphVertex vertex in graphVertexList)
+        foreach (GraphVertex vertex in cornerGraphVertexList)
         {
             sumX += vertex.x;
             sumY += vertex.y;
         }
-        float avgX = sumX / (float)graphVertexList.Count;
-        float avgY = sumY / (float)graphVertexList.Count;
+        float avgX = sumX / (float)cornerGraphVertexList.Count;
+        float avgY = sumY / (float)cornerGraphVertexList.Count;
         float avgZ = 0.0f;
         if (this.floor == 0)
         {
@@ -185,24 +183,25 @@ public class GraphPolygon
 
     public void SortGraphVertexClockwise()
     {
-        graphVertexList = graphVertexList.OrderBy(x => Mathf.Atan2(x.x - center.x, x.y - center.y)).ToList();
+        // 好用！
+        cornerGraphVertexList = cornerGraphVertexList.OrderBy(x => Mathf.Atan2(x.x - center.x, x.y - center.y)).ToList();
     }
 
     public List<GraphPolygon> SplitToQuads()
     {
         GraphVertex centeroid = new GraphVertex(this.center);
         List<GraphPolygon> splitList = new List<GraphPolygon>();
-        for (int i = 0; i < graphVertexList.Count; i++)
+        for (int i = 0; i < cornerGraphVertexList.Count; i++)
         {
             int indexNext = i + 1;
             int indexPrev = i - 1;
-            if (i == graphVertexList.Count - 1)
+            if (i == cornerGraphVertexList.Count - 1)
                 indexNext = 0;
             if (i == 0)
-                indexPrev = graphVertexList.Count - 1;
-            GraphVertex c1 = CommonUtils.FindLineCenter(graphVertexList[indexPrev], graphVertexList[i]);
-            GraphVertex c2 = CommonUtils.FindLineCenter(graphVertexList[i], graphVertexList[indexNext]);
-            GraphPolygon polygon = new GraphPolygon(new List<GraphVertex> { c1, c2, graphVertexList[i], centeroid });
+                indexPrev = cornerGraphVertexList.Count - 1;
+            GraphVertex c1 = CommonUtils.FindLineCenter(cornerGraphVertexList[indexPrev], cornerGraphVertexList[i]);
+            GraphVertex c2 = CommonUtils.FindLineCenter(cornerGraphVertexList[i], cornerGraphVertexList[indexNext]);
+            GraphPolygon polygon = new GraphPolygon(new List<GraphVertex> { c1, c2, cornerGraphVertexList[i], centeroid });
             splitList.Add(polygon);
         }
         return splitList;

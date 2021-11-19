@@ -24,11 +24,11 @@ public class GraphRelaxation
          first derivative for the loss function
          */
 
-        if (polygon.graphVertexList.Count != 4)
+        if (polygon.cornerGraphVertexList.Count != 4)
             return null;
         float radius = (polygon.sideLength / 8.0f ) * Mathf.Sqrt(2);
-        float derive = 2 * radius * Mathf.Sin(alpha * (polygon.graphVertexList[0].x - polygon.graphVertexList[1].y - polygon.graphVertexList[2].x + polygon.graphVertexList[3].y))
-            + 2 * radius * Mathf.Cos(alpha * (-polygon.graphVertexList[0].y - polygon.graphVertexList[1].x + polygon.graphVertexList[2].y + polygon.graphVertexList[3].x));
+        float derive = 2 * radius * Mathf.Sin(alpha * (polygon.cornerGraphVertexList[0].x - polygon.cornerGraphVertexList[1].y - polygon.cornerGraphVertexList[2].x + polygon.cornerGraphVertexList[3].y))
+            + 2 * radius * Mathf.Cos(alpha * (-polygon.cornerGraphVertexList[0].y - polygon.cornerGraphVertexList[1].x + polygon.cornerGraphVertexList[2].y + polygon.cornerGraphVertexList[3].x));
         return derive;
     }
 
@@ -38,19 +38,19 @@ public class GraphRelaxation
          second derivative for the loss function
          */
 
-        if (polygon.graphVertexList.Count != 4)
+        if (polygon.cornerGraphVertexList.Count != 4)
             return 0;
-        float derive = 2 * radius * Mathf.Cos(alpha * (polygon.graphVertexList[0].x - polygon.graphVertexList[1].y - polygon.graphVertexList[2].x + polygon.graphVertexList[3].y))
-            + 2 * radius * Mathf.Sin(alpha * (polygon.graphVertexList[0].y + polygon.graphVertexList[1].x - polygon.graphVertexList[2].y - polygon.graphVertexList[3].x));
+        float derive = 2 * radius * Mathf.Cos(alpha * (polygon.cornerGraphVertexList[0].x - polygon.cornerGraphVertexList[1].y - polygon.cornerGraphVertexList[2].x + polygon.cornerGraphVertexList[3].y))
+            + 2 * radius * Mathf.Sin(alpha * (polygon.cornerGraphVertexList[0].y + polygon.cornerGraphVertexList[1].x - polygon.cornerGraphVertexList[2].y - polygon.cornerGraphVertexList[3].x));
         return derive;
     }
 
     public float ArgumentMinAlpha(GraphPolygon polygon, float radius)
     {
-        if (polygon.graphVertexList.Count != 4)
+        if (polygon.cornerGraphVertexList.Count != 4)
             return 0;
-        float numerator = (float)(polygon.graphVertexList[0].y + polygon.graphVertexList[1].x - polygon.graphVertexList[2].y - polygon.graphVertexList[3].x);
-        float denominator = (float)(polygon.graphVertexList[0].x - polygon.graphVertexList[1].y - polygon.graphVertexList[2].x + polygon.graphVertexList[3].y);
+        float numerator = (float)(polygon.cornerGraphVertexList[0].y + polygon.cornerGraphVertexList[1].x - polygon.cornerGraphVertexList[2].y - polygon.cornerGraphVertexList[3].x);
+        float denominator = (float)(polygon.cornerGraphVertexList[0].x - polygon.cornerGraphVertexList[1].y - polygon.cornerGraphVertexList[2].x + polygon.cornerGraphVertexList[3].y);
         if (denominator == 0)
         {
             return 0;
@@ -75,12 +75,12 @@ public class GraphRelaxation
 
     private List<GraphVertex> AlignToVertex(GraphPolygon polygon, List<GraphVertex> quadList)
     {
-        if(polygon.graphVertexList.Count < 1)
+        if(polygon.cornerGraphVertexList.Count < 1)
         {
-            return polygon.graphVertexList;
+            return polygon.cornerGraphVertexList;
         }
         Hashtable closestTable = new Hashtable();
-        foreach (GraphVertex vertex in polygon.graphVertexList)
+        foreach (GraphVertex vertex in polygon.cornerGraphVertexList)
         {
             GraphVertex minVertex = CommonUtils.FindClosestVertexForTarget(quadList, vertex);
             closestTable[vertex] = minVertex;
@@ -88,7 +88,7 @@ public class GraphRelaxation
         if(closestTable.Count == 4)
         {
             List<GraphVertex> alignedVertexList = new List<GraphVertex>();
-            foreach (GraphVertex vertex in polygon.graphVertexList)
+            foreach (GraphVertex vertex in polygon.cornerGraphVertexList)
             {
                 alignedVertexList.Add((GraphVertex)closestTable[vertex]);
             }
@@ -96,7 +96,7 @@ public class GraphRelaxation
         }
         else
         {
-            return polygon.graphVertexList;
+            return polygon.cornerGraphVertexList;
         }
     }
 
@@ -105,17 +105,17 @@ public class GraphRelaxation
         Hashtable differentiate = new Hashtable();
         foreach (GraphPolygon polygon in polygonList)
         {
-            foreach (GraphVertex vertex in polygon.graphVertexList)
+            foreach (GraphVertex vertex in polygon.cornerGraphVertexList)
             {
                 differentiate[vertex] = new List<float>();
             }
         }
         foreach (GraphPolygon polygon in polygonList)
         {
-            if (polygon.graphVertexList.Count < 1)
+            if (polygon.cornerGraphVertexList.Count < 1)
                 continue;
             GraphVertex center = polygon.center;
-            float radius = CommonUtils.GraphVertexEuclideanDistance(CommonUtils.FindClosestVertexForTarget(polygon.graphVertexList, center), center);
+            float radius = CommonUtils.GraphVertexEuclideanDistance(CommonUtils.FindClosestVertexForTarget(polygon.cornerGraphVertexList, center), center);
             float alpha;
             if (!this.alphaCache.Contains(polygon) || !this.alphaFix)
             {
@@ -126,15 +126,15 @@ public class GraphRelaxation
             // Debug.Log("current alpha=" + alpha.ToString());
             List<GraphVertex> cornerCoordinateList = CornerCoordinates(center, alpha, radius);
             List<GraphVertex> alignedList = AlignToVertex(polygon, cornerCoordinateList);
-            for(int i = 0; i < polygon.graphVertexList.Count; i++)
+            for(int i = 0; i < polygon.cornerGraphVertexList.Count; i++)
             {
-                float xDiff = (alignedList[i].x - polygon.graphVertexList[i].x) * this.learningRate;
-                float yDiff = (alignedList[i].y - polygon.graphVertexList[i].y) * this.learningRate;
+                float xDiff = (alignedList[i].x - polygon.cornerGraphVertexList[i].x) * this.learningRate;
+                float yDiff = (alignedList[i].y - polygon.cornerGraphVertexList[i].y) * this.learningRate;
                 // Debug.Log("total sum diff: " + xDiff.ToString() + ", " + yDiff.ToString());
-                var v = (List<float>)differentiate[polygon.graphVertexList[i]];
+                var v = (List<float>)differentiate[polygon.cornerGraphVertexList[i]];
                 v.Add(xDiff);
                 v.Add(yDiff);
-                differentiate[polygon.graphVertexList[i]] = v;
+                differentiate[polygon.cornerGraphVertexList[i]] = v;
             }
         }
         Hashtable averageDifferentiate = new Hashtable();
@@ -161,17 +161,17 @@ public class GraphRelaxation
         float totalLoss = 0;
         foreach (GraphPolygon polygon in polygonList)
         {
-            for(int i = 0; i < polygon.graphVertexList.Count; i++)
+            for(int i = 0; i < polygon.cornerGraphVertexList.Count; i++)
             {
-                if (!averageDifferentiate.ContainsKey(polygon.graphVertexList[i]))
+                if (!averageDifferentiate.ContainsKey(polygon.cornerGraphVertexList[i]))
                 {
                     continue;
                 }
-                List<float> avg = (List<float>)averageDifferentiate[polygon.graphVertexList[i]];
+                List<float> avg = (List<float>)averageDifferentiate[polygon.cornerGraphVertexList[i]];
                 if (avg.Count != 2)
                     continue;
-                polygon.graphVertexList[i].x += avg[0];
-                polygon.graphVertexList[i].y += avg[1];
+                polygon.cornerGraphVertexList[i].x += avg[0];
+                polygon.cornerGraphVertexList[i].y += avg[1];
                 totalLoss += avg[0];
                 totalLoss += avg[1];
             }
@@ -189,7 +189,7 @@ public class GraphRelaxation
         for(int ep = 0; ep < epoches; ep++)
         {
             RelaxSingleStepUpdate(polygonList, ep);
-            int vertexNum = polygonList.Sum(obj => obj.graphVertexList.Count);
+            int vertexNum = polygonList.Sum(obj => obj.cornerGraphVertexList.Count);
             // Debug.Log("polygon list size=" + polygonList.Count.ToString() + " with total vertex num=" + vertexNum);
         }
         return polygonList;

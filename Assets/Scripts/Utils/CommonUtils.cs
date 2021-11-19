@@ -64,9 +64,9 @@ public class CommonUtils : MonoBehaviour
     public static List<GraphVertex> GetSharedVertexBetweenPolygon(GraphPolygon polygon1, GraphPolygon polygon2)
     {
         List<GraphVertex> sharedList = new List<GraphVertex>();
-        foreach (GraphVertex v1 in polygon1.graphVertexList)
+        foreach (GraphVertex v1 in polygon1.cornerGraphVertexList)
         {
-            foreach (GraphVertex v2 in polygon2.graphVertexList)
+            foreach (GraphVertex v2 in polygon2.cornerGraphVertexList)
             {
                 if (v1.x == v2.x && v1.y == v2.y)
                 {

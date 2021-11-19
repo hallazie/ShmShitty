@@ -46,16 +46,16 @@ public class GraphModifier
         List<GraphVertex> lineCenterList = new List<GraphVertex>();
         foreach (GraphPolygon polygon in polygonList)
         {
-            for (int i = 0; i < polygon.graphVertexList.Count; i++)
+            for (int i = 0; i < polygon.cornerGraphVertexList.Count; i++)
             {
                 int indexNext = i + 1;
                 int indexPrev = i - 1;
-                if (i == polygon.graphVertexList.Count - 1)
+                if (i == polygon.cornerGraphVertexList.Count - 1)
                     indexNext = 0;
                 if (i == 0)
-                    indexPrev = polygon.graphVertexList.Count - 1;
-                GraphVertex c1 = CommonUtils.FindLineCenter(polygon.graphVertexList[indexPrev], polygon.graphVertexList[i]);
-                GraphVertex c2 = CommonUtils.FindLineCenter(polygon.graphVertexList[i], polygon.graphVertexList[indexNext]);
+                    indexPrev = polygon.cornerGraphVertexList.Count - 1;
+                GraphVertex c1 = CommonUtils.FindLineCenter(polygon.cornerGraphVertexList[indexPrev], polygon.cornerGraphVertexList[i]);
+                GraphVertex c2 = CommonUtils.FindLineCenter(polygon.cornerGraphVertexList[i], polygon.cornerGraphVertexList[indexNext]);
                 GraphVertex l1 = null;
                 GraphVertex l2 = null;
                 foreach (GraphVertex v in lineCenterList)
@@ -79,13 +79,13 @@ public class GraphModifier
                     lineCenterList.Add(c2);
                     l2 = c2;
                 }
-                GraphPolygon splitedPolygon = new GraphPolygon(new List<GraphVertex> { l1, l2, polygon.graphVertexList[i], polygon.center });
+                GraphPolygon splitedPolygon = new GraphPolygon(new List<GraphVertex> { l1, l2, polygon.cornerGraphVertexList[i], polygon.center });
                 if (!vertexList.Contains(l1))
                     vertexList.Add(l1);
                 if (!vertexList.Contains(l2))
                     vertexList.Add(l2);
-                if (!vertexList.Contains(polygon.graphVertexList[i]))
-                    vertexList.Add(polygon.graphVertexList[i]);
+                if (!vertexList.Contains(polygon.cornerGraphVertexList[i]))
+                    vertexList.Add(polygon.cornerGraphVertexList[i]);
                 if (!vertexList.Contains(polygon.center))
                     vertexList.Add(polygon.center);
                 splitedList.Add(splitedPolygon);
@@ -97,9 +97,9 @@ public class GraphModifier
     private int IntersectVertexCountBetweenTwoPolygon(GraphPolygon p1, GraphPolygon p2)
     {
         int intersectCount = 0;
-        foreach (GraphVertex v1 in p1.graphVertexList)
+        foreach (GraphVertex v1 in p1.cornerGraphVertexList)
         {
-            foreach (GraphVertex v2 in p2.graphVertexList)
+            foreach (GraphVertex v2 in p2.cornerGraphVertexList)
             {
                 if (v1.x == v2.x && v1.y == v2.y)
                 {
@@ -146,8 +146,8 @@ public class GraphModifier
 
             float distance = CommonUtils.GraphVertexEuclideanDistance(head.center, tail.center);
 
-            HashSet<GraphVertex> headVertex = new HashSet<GraphVertex>(head.graphVertexList);
-            HashSet<GraphVertex> tailVertex = new HashSet<GraphVertex>(tail.graphVertexList);
+            HashSet<GraphVertex> headVertex = new HashSet<GraphVertex>(head.cornerGraphVertexList);
+            HashSet<GraphVertex> tailVertex = new HashSet<GraphVertex>(tail.cornerGraphVertexList);
             headVertex.UnionWith(tailVertex);
             GraphPolygon mergePolygon = new GraphPolygon(new List<GraphVertex>(headVertex));
             if (!ValidNeighbor(mergePolygon) && false)
@@ -165,7 +165,7 @@ public class GraphModifier
         HashSet<GraphVertex> vertexSet = new HashSet<GraphVertex>();
         foreach (GraphPolygon polygon in mergedList)
         {
-            foreach (GraphVertex vertex in polygon.graphVertexList)
+            foreach (GraphVertex vertex in polygon.cornerGraphVertexList)
             {
                 vertexSet.Add(vertex);
             }
@@ -179,14 +179,14 @@ public class GraphModifier
     private bool ValidNeighbor(GraphPolygon mergePolygon)
     {
         List<float> adjecentDistanceList = new List<float>();
-        for(int i = 0; i < mergePolygon.graphVertexList.Count; i++)
+        for(int i = 0; i < mergePolygon.cornerGraphVertexList.Count; i++)
         {
             int next = i + 1;
-            if (i == mergePolygon.graphVertexList.Count - 1)
+            if (i == mergePolygon.cornerGraphVertexList.Count - 1)
             {
                 next = 0;
             }
-            adjecentDistanceList.Add(CommonUtils.GraphVertexEuclideanDistance(mergePolygon.graphVertexList[i], mergePolygon.graphVertexList[next]));
+            adjecentDistanceList.Add(CommonUtils.GraphVertexEuclideanDistance(mergePolygon.cornerGraphVertexList[i], mergePolygon.cornerGraphVertexList[next]));
         }
         if(adjecentDistanceList.Count < 2)
         {
