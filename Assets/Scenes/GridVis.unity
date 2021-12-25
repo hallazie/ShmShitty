@@ -157,6 +157,8 @@ MonoBehaviour:
   learningEpoch: 100
   learningRate: 0.5
   fixAlpha: 1
+  renderLineList: []
+  lineRenderer: {fileID: 435611259128315190, guid: 94c5ac5a0bb03ca4d96a444b999c2037, type: 3}
   lineMat: {fileID: -5243988174349660497, guid: 157194ffb879d0441939b19c609cbc33, type: 3}
 --- !u!4 &525697231
 Transform:

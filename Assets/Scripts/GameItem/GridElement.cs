@@ -9,6 +9,8 @@ public class GridElement : MonoBehaviour
     private List<CornerElement> cornerList;
     private int floor;
     private Vector3 coord;
+    private bool enabled;
+
 
     // Start is called before the first frame update
     void Start()

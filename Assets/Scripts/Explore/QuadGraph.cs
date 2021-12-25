@@ -18,6 +18,8 @@ public class QuadGraph : MonoBehaviour
     public int learningEpoch;
     public float learningRate;
     public bool fixAlpha;
+    public Line[] renderLineList;
+    public Line lineRenderer;
 
     public List<GraphPolygon> polygonList
     {
@@ -35,7 +37,7 @@ public class QuadGraph : MonoBehaviour
         }
     }
 
-    private LineRenderer line;
+  
     List<Color> colorList;
 
     HexagonGraphVertexSampler graphVertexSampler;
@@ -69,25 +71,29 @@ public class QuadGraph : MonoBehaviour
 
     private void DrawGraphByRenderer()
     {
-        int lineCount = 0;
+
+        renderLineList = new Line[relaxPolygonList.Count];
+
         foreach (GraphPolygon polygon in relaxPolygonList)
         {
             for (int i = 0; i < polygon.cornerGraphVertexList.Count; i++)
             {
                 int j = (i == polygon.cornerGraphVertexList.Count - 1) ? 0 : i + 1;
-                line = new GameObject("line" + lineCount).AddComponent<LineRenderer>();
-                line.material = new Material(Shader.Find("Sprites/Default"));
-                line.startColor = new Color32(65, 105, 225, 200);
-                line.endColor = new Color32(65, 105, 225, 200);
-                line.positionCount = 2;
-                line.startWidth = 0.025f;
-                line.endWidth = 0.025f;
-                line.useWorldSpace = true;
-                line.numCapVertices = 10;
-                line.SetPosition(0, polygon.cornerGraphVertexList[i].ToVector3());
-                line.SetPosition(1, polygon.cornerGraphVertexList[j].ToVector3());
-                line = null;
-                lineCount++;
+                // LineRenderer line = new GameObject("line" + i).AddComponent<LineRenderer>();
+                Line line = Instantiate(lineRenderer, Vector3.zero, Quaternion.identity, this.transform);
+                line.name = "line" + i;
+                line.renderer.material = new Material(Shader.Find("Sprites/Default"));
+                line.renderer.startColor = new Color32(65, 105, 225, 200);
+                line.renderer.endColor = new Color32(65, 105, 225, 200);
+                line.renderer.positionCount = 2;
+                line.renderer.startWidth = 0.025f;
+                line.renderer.endWidth = 0.025f;
+                line.renderer.useWorldSpace = true;
+                line.renderer.numCapVertices = 10;
+                line.renderer.SetPosition(0, polygon.cornerGraphVertexList[i].ToVector3());
+                line.renderer.SetPosition(1, polygon.cornerGraphVertexList[j].ToVector3());
+
+                renderLineList[i] = line;
             }
         }
     }

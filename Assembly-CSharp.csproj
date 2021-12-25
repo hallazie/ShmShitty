@@ -62,6 +62,7 @@
     <Compile Include="Assets\Scripts\GraphManagement\GraphVertexSampler\HexagonGraphVertexSampler.cs" />
     <Compile Include="Assets\Scripts\GraphManagement\GraphGenerator.cs" />
     <Compile Include="Assets\Scripts\Interaction\SimpleCameraController.cs" />
+    <Compile Include="Assets\Scripts\GridManager\GridGenerator.cs" />
     <Compile Include="Assets\Scripts\GraphManagement\GraphRelaxation.cs" />
     <Compile Include="Assets\Scripts\GraphManagement\GraphModifier.cs" />
     <Compile Include="Assets\Scripts\GameItem\CornerElement.cs" />
@@ -75,7 +76,7 @@
     <Compile Include="Assets\Scripts\Interaction\GraphInputManager.cs" />
     <Compile Include="Assets\Scripts\GlobalConst.cs" />
     <Compile Include="Assets\Scripts\PlacingManagement\SimplePlacingHandler.cs" />
-    <Compile Include="Assets\Scripts\GridManager\GridGenerator.cs" />
+    <Compile Include="Assets\Scripts\Explore\Line.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
