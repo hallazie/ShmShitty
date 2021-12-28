@@ -10,7 +10,7 @@ public class Line : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        renderer = new GameObject("").AddComponent<LineRenderer>();
+        renderer = gameObject.AddComponent<LineRenderer>();
     }
 
     // Update is called once per frame
