@@ -76,7 +76,6 @@
     <Compile Include="Assets\Scripts\Interaction\GraphInputManager.cs" />
     <Compile Include="Assets\Scripts\GlobalConst.cs" />
     <Compile Include="Assets\Scripts\PlacingManagement\SimplePlacingHandler.cs" />
-    <Compile Include="Assets\Scripts\Explore\Line.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

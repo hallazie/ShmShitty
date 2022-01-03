@@ -33,6 +33,7 @@ public class GraphVisualizeOperator : MonoBehaviour
         {
             int j = (i == virtualPolygon.cornerGraphVertexList.Count - 1) ? 0 : i + 1;
             line = new GameObject("virtualPolygonLine").AddComponent<LineRenderer>();
+            line.transform.parent = this.transform;
             line.tag = "VirtualPolygonLine";
             line.material = new Material(Shader.Find("Sprites/Default"));
             line.startColor = new Color32(105, 65, 225, 200);
