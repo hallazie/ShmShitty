@@ -591,7 +591,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6fcef982beccceb4fb080084425531d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  layerNumber: 10
+  cornerElement: {fileID: 7606485746407860711, guid: 7c153713722bf1f47ab5b24f510cb029, type: 3}
+  gridElement: {fileID: 1646532402612534335, guid: 82588966190aff14fabc090d37c70536, type: 3}
+  layerNumber: 8
   mergeProb: 0.8
   learningEpoch: 100
   learningRate: 0.5

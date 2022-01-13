@@ -11,8 +11,11 @@ public class GridGenerator : MonoBehaviour
     private List<GraphPolygon> mergedPolygonList = new List<GraphPolygon>();
     private List<GraphPolygon> relaxPolygonList = new List<GraphPolygon>();
 
-    private List<CornerElement> cornerElementList = new List<CornerElement>();
-    private List<GridElement> gridElementList = new List<GridElement>();
+    public CornerElement cornerElement;
+    public GridElement gridElement;
+
+    public Dictionary<Vector3, CornerElement> cornerElementDict = new Dictionary<Vector3, CornerElement>();
+    public Dictionary<Vector3, GridElement> gridElementDict = new Dictionary<Vector3, GridElement>();
 
     public int layerNumber = 10;
     public float mergeProb = 0.8f;
@@ -44,6 +47,15 @@ public class GridGenerator : MonoBehaviour
         
     }
 
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+        foreach (GridElement elem in gridElementDict.Values)
+        {
+            Gizmos.DrawSphere(elem.transform.position, 0.05f);
+        }
+    }
+
     private void InitQuadGrid()
     {
         foreach (GraphVertex vertex in graphVertixList)
@@ -52,17 +64,30 @@ public class GridGenerator : MonoBehaviour
             for (int floor = 0; floor < floorNumber; floor++)
             {
                 Vector3 coord = new Vector3(vertex.x, floor * floorHeight, vertex.y);
-                GridElement gridElement = new GridElement(floor, coord);
+                GridElement gridElementInst = Instantiate(gridElement, Vector3.zero, Quaternion.identity, this.transform);
+                gridElementInst.Instantiate(floor, coord);
                 foreach (GraphVertex corner in encircledPolygon.cornerGraphVertexList)
                 {
-                    CornerElement cornerElement = new CornerElement();
-                    gridElement.cornerList.Add(cornerElement);
-                    cornerElementList.Add(cornerElement);
+                    Vector3 cornerCoord = new Vector3(corner.x, floor * floorHeight, corner.y);
+                    CornerElement cornerElementInst = Instantiate(cornerElement, Vector3.zero, Quaternion.identity, this.transform);
+                    cornerElementInst.Instantiate();
+                    gridElement.cornerList.Add(cornerElementInst);
+                    if (!cornerElementDict.ContainsKey(cornerCoord))
+                    {
+                        cornerElementDict.Add(cornerCoord, cornerElementInst);
+                    }
                 }
-                gridElementList.Add(gridElement);
+                foreach (GraphVertex adjecentVertex in vertex.adjecentPolygonList)
+                {
+
+                }
+                if (!gridElementDict.ContainsKey(coord))
+                {
+                    gridElementDict.Add(coord, gridElementInst);
+                }
             }
         }
-        Debug.Log("grid element list init finished with size: " + gridElementList.Count + " and corner element list init finished with size: " + cornerElementList.Count);
+        Debug.Log("grid element list init finished with size: " + gridElementDict.Count + " and corner element list init finished with size: " + cornerElementDict.Count);
     }
 
     private void InitQuadGraph()
@@ -75,3 +100,6 @@ public class GridGenerator : MonoBehaviour
         Debug.Log("polygon init finished with size: " + relaxPolygonList.Count);
     }
 }
+
+
+

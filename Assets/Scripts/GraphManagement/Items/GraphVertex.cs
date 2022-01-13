@@ -69,6 +69,22 @@ public class GraphVertex
         }
     }
 
+    public List<GraphVertex> adjecentVertexList
+    {
+        set
+        {
+
+        }
+        get
+        {
+            if (this._adjecentVertexList.Count > 1)
+            {
+                
+            }
+            return this.adjecentVertexList;
+        }
+    }
+
     public List<GraphPolygon> adjecentPolygonList
     {
         set
