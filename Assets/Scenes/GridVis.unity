@@ -598,7 +598,7 @@ MonoBehaviour:
   learningEpoch: 100
   learningRate: 0.5
   fixAlpha: 1
-  floorNumber: 5
+  floorNumber: 12
   floorHeight: 1
 --- !u!4 &1729608223
 Transform:

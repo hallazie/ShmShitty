@@ -39,6 +39,7 @@ public class GridGenerator : MonoBehaviour
         graphRelaxation = new GraphRelaxation(learningRate, fixAlpha);
 
         InitQuadGraph();
+        AddAdjecentPolygonToVertex();
         InitQuadGrid();
     }
 
@@ -53,6 +54,11 @@ public class GridGenerator : MonoBehaviour
         foreach (GridElement elem in gridElementDict.Values)
         {
             Gizmos.DrawSphere(elem.transform.position, 0.05f);
+        }
+        Gizmos.color = Color.red;
+        foreach (CornerElement elem in cornerElementDict.Values)
+        {
+            Gizmos.DrawSphere(elem.transform.position, 0.025f);
         }
     }
 
@@ -70,17 +76,14 @@ public class GridGenerator : MonoBehaviour
                 {
                     Vector3 cornerCoord = new Vector3(corner.x, floor * floorHeight, corner.y);
                     CornerElement cornerElementInst = Instantiate(cornerElement, Vector3.zero, Quaternion.identity, this.transform);
-                    cornerElementInst.Instantiate();
+                    cornerElementInst.Instantiate(floor, coord);
                     gridElement.cornerList.Add(cornerElementInst);
                     if (!cornerElementDict.ContainsKey(cornerCoord))
                     {
                         cornerElementDict.Add(cornerCoord, cornerElementInst);
                     }
                 }
-                foreach (GraphVertex adjecentVertex in vertex.adjecentPolygonList)
-                {
 
-                }
                 if (!gridElementDict.ContainsKey(coord))
                 {
                     gridElementDict.Add(coord, gridElementInst);
@@ -98,6 +101,20 @@ public class GridGenerator : MonoBehaviour
         quadPolygonList = graphModifier.SplitToQuads(mergedPolygonList, graphVertixList);
         relaxPolygonList = graphRelaxation.Relaxation(quadPolygonList, this.learningEpoch, this.learningRate);
         Debug.Log("polygon init finished with size: " + relaxPolygonList.Count);
+    }
+
+    private void AddAdjecentPolygonToVertex()
+    {
+        foreach (GraphVertex vertex in graphVertixList)
+        {
+            foreach (GraphPolygon polygon in relaxPolygonList)
+            {
+                if (polygon.cornerGraphVertexList.Contains(vertex))
+                {
+                    vertex.AddToAdjcentPolygonList(polygon);
+                }
+            }
+        }
     }
 }
 

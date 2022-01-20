@@ -177,7 +177,7 @@ public class GraphRelaxation
             }
             polygon.RecalculateCenter();
         }
-        Debug.Log("Epoch=" + epoch.ToString() + ", Loss=" + totalLoss.ToString());
+        // Debug.Log("Epoch=" + epoch.ToString() + ", Loss=" + totalLoss.ToString());
     }
 
     public List<GraphPolygon> Relaxation(List<GraphPolygon> polygonList, int epoches = 10, float? learningRate = null)
