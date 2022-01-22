@@ -31,6 +31,8 @@ public class GridGenerator : MonoBehaviour
     public int floorNumber = 5;
     public float floorHeight = 1.0f;
 
+    public bool showCorners = true;
+
     void Start()
     {
         graphVertexSampler = new HexagonGraphVertexSampler();
@@ -55,11 +57,15 @@ public class GridGenerator : MonoBehaviour
         {
             Gizmos.DrawSphere(elem.transform.position, 0.05f);
         }
-        Gizmos.color = Color.red;
-        foreach (CornerElement elem in cornerElementDict.Values)
+        if (showCorners)
         {
-            Gizmos.DrawSphere(elem.transform.position, 0.025f);
+            Gizmos.color = Color.red;
+            foreach (CornerElement elem in cornerElementDict.Values)
+            {
+                Gizmos.DrawSphere(elem.transform.position, 0.025f);
+            }
         }
+
     }
 
     private void InitQuadGrid()
