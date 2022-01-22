@@ -72,27 +72,29 @@ public class GridGenerator : MonoBehaviour
     {
         foreach (GraphVertex vertex in graphVertixList)
         {
-            GraphPolygon encircledPolygon = CommonUtils.GetEncircledPolygonOfVertex(vertex);
             for (int floor = 0; floor < floorNumber; floor++)
             {
                 Vector3 coord = new Vector3(vertex.x, floor * floorHeight, vertex.y);
                 GridElement gridElementInst = Instantiate(gridElement, Vector3.zero, Quaternion.identity, this.transform);
                 gridElementInst.Instantiate(floor, coord);
-                foreach (GraphVertex corner in encircledPolygon.cornerGraphVertexList)
-                {
-                    Vector3 cornerCoord = new Vector3(corner.x, floor * floorHeight, corner.y);
-                    CornerElement cornerElementInst = Instantiate(cornerElement, Vector3.zero, Quaternion.identity, this.transform);
-                    cornerElementInst.Instantiate(floor, coord);
-                    gridElement.cornerList.Add(cornerElementInst);
-                    if (!cornerElementDict.ContainsKey(cornerCoord))
-                    {
-                        cornerElementDict.Add(cornerCoord, cornerElementInst);
-                    }
-                }
-
                 if (!gridElementDict.ContainsKey(coord))
                 {
                     gridElementDict.Add(coord, gridElementInst);
+                }
+
+                foreach (GraphPolygon adjPolygon in relaxPolygonList)
+                {
+                    if (adjPolygon.cornerGraphVertexList.Contains(vertex))
+                    {
+                        Vector3 cornerCoord = new Vector3(adjPolygon.center.x, floor * floorHeight, adjPolygon.center.y);
+                        CornerElement cornerElementInst = Instantiate(cornerElement, Vector3.zero, Quaternion.identity, this.transform);
+                        cornerElementInst.Instantiate(floor, cornerCoord);
+                        gridElementInst.cornerList.Add(cornerElementInst);
+                        if (!cornerElementDict.ContainsKey(cornerCoord))
+                        {
+                            cornerElementDict.Add(cornerCoord, cornerElementInst);
+                        }
+                    }
                 }
             }
         }
