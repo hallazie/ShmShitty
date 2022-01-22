@@ -14,7 +14,8 @@ public class GridGenerator : MonoBehaviour
     public CornerElement cornerElement;
     public GridElement gridElement;
 
-    public Dictionary<Vector3, CornerElement> cornerElementDict = new Dictionary<Vector3, CornerElement>();
+    // public Dictionary<Vector3, CornerElement> cornerElementDict = new Dictionary<Vector3, CornerElement>();
+    public List<CornerElement> cornerElementList = new List<CornerElement>();
     public Dictionary<Vector3, GridElement> gridElementDict = new Dictionary<Vector3, GridElement>();
 
     public int layerNumber = 10;
@@ -60,9 +61,11 @@ public class GridGenerator : MonoBehaviour
         if (showCorners)
         {
             Gizmos.color = Color.red;
-            foreach (CornerElement elem in cornerElementDict.Values)
+            foreach (CornerElement elem in cornerElementList)
             {
                 Gizmos.DrawSphere(elem.transform.position, 0.025f);
+                Gizmos.DrawLine(elem.transform.position, elem.prevCoord);
+                Gizmos.DrawLine(elem.transform.position, elem.nextCoord);
             }
         }
 
@@ -86,19 +89,31 @@ public class GridGenerator : MonoBehaviour
                 {
                     if (adjPolygon.cornerGraphVertexList.Contains(vertex))
                     {
+                        Vector3 prevCoord = Vector3.zero;
+                        Vector3 nextCoord = Vector3.zero;
+                        adjPolygon.SortGraphVertexClockwise();
+                        for (int i = 0; i < adjPolygon.cornerGraphVertexList.Count; i++)
+                        {
+                            if (adjPolygon.cornerGraphVertexList[i] == vertex)
+                            {
+                                int prevIndex = i == 0 ? adjPolygon.cornerGraphVertexList.Count - 1 : i - 1;
+                                int nextIndex = i == adjPolygon.cornerGraphVertexList.Count - 1 ? 0 : i + 1;
+                                prevCoord = new Vector3((adjPolygon.cornerGraphVertexList[prevIndex].x + vertex.x) / 2.0f, floor, (adjPolygon.cornerGraphVertexList[prevIndex].y + vertex.y) / 2.0f);
+                                nextCoord = new Vector3((adjPolygon.cornerGraphVertexList[nextIndex].x + vertex.x) / 2.0f, floor, (adjPolygon.cornerGraphVertexList[nextIndex].y + vertex.y) / 2.0f);
+                            }
+                        }
                         Vector3 cornerCoord = new Vector3(adjPolygon.center.x, floor * floorHeight, adjPolygon.center.y);
                         CornerElement cornerElementInst = Instantiate(cornerElement, Vector3.zero, Quaternion.identity, this.transform);
                         cornerElementInst.Instantiate(floor, cornerCoord);
+                        cornerElementInst.prevCoord = prevCoord;
+                        cornerElementInst.nextCoord = nextCoord;
                         gridElementInst.cornerList.Add(cornerElementInst);
-                        if (!cornerElementDict.ContainsKey(cornerCoord))
-                        {
-                            cornerElementDict.Add(cornerCoord, cornerElementInst);
-                        }
+                        cornerElementList.Add(cornerElementInst);
                     }
                 }
             }
         }
-        Debug.Log("grid element list init finished with size: " + gridElementDict.Count + " and corner element list init finished with size: " + cornerElementDict.Count);
+        Debug.Log("grid element list init finished with size: " + gridElementDict.Count + " and corner element list init finished with size: " + cornerElementList.Count);
     }
 
     private void InitQuadGraph()

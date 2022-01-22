@@ -9,6 +9,9 @@ public class CornerElement : MonoBehaviour
     public Vector3 coord;
     public int floor;
 
+    public Vector3 prevCoord = Vector3.zero;
+    public Vector3 nextCoord = Vector3.zero;
+
     public void Instantiate(int floor, Vector3 coord)
     {
         this.floor = floor;
