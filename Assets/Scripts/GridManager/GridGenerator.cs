@@ -43,6 +43,7 @@ public class GridGenerator : MonoBehaviour
 
         InitQuadGraph();
         AddAdjecentPolygonToVertex();
+        RemoveEdgingVertex();
         InitQuadGrid();
     }
 
@@ -66,6 +67,10 @@ public class GridGenerator : MonoBehaviour
                 Gizmos.DrawSphere(elem.transform.position, 0.025f);
                 Gizmos.DrawLine(elem.transform.position, elem.prevCoord);
                 Gizmos.DrawLine(elem.transform.position, elem.nextCoord);
+                if(elem.floor < floorNumber-1)
+                {
+                    Gizmos.DrawLine(elem.transform.position, new Vector3(elem.transform.position.x, elem.transform.position.y+1, elem.transform.position.z));
+                }
             }
         }
 
@@ -138,6 +143,40 @@ public class GridGenerator : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void RemoveEdgingVertex()
+    {
+        List<GraphVertex> removeList = new List<GraphVertex>();
+        foreach (GraphVertex vertex in graphVertixList)
+        {
+            float angleSum = 0.0f;
+            if (vertex.adjecentPolygonList.Count < 2)
+            {
+                removeList.Add(vertex);
+                continue;
+            }
+            for(int i = 0; i < vertex.adjecentPolygonList.Count; i++)
+            {
+                int j = i != vertex.adjecentPolygonList.Count - 1 ? i + 1 : 0;
+                Vector3 v1 = new Vector3(vertex.adjecentPolygonList[i].center.x - vertex.x, 0, vertex.adjecentPolygonList[i].center.y - vertex.y);
+                Vector3 v2 = new Vector3(vertex.adjecentPolygonList[j].center.x - vertex.x, 0, vertex.adjecentPolygonList[j].center.y - vertex.y);
+                float angle = Vector3.Angle(v1, v2);
+                angleSum += angle;
+            }
+            if (Mathf.Abs(angleSum - 360) > 0.01)
+            {
+                Debug.Log("angle sum for vertex (" + vertex.x + ", " + vertex.y + "): " + angleSum);
+                removeList.Add(vertex);
+            }
+        }
+        foreach (GraphVertex removeVertex in removeList)
+        {
+            if (graphVertixList.Contains(removeVertex))
+            {
+                graphVertixList.Remove(removeVertex);
+            }
+        }    
     }
 }
 

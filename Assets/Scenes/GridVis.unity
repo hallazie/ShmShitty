@@ -593,13 +593,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cornerElement: {fileID: 7606485746407860711, guid: 7c153713722bf1f47ab5b24f510cb029, type: 3}
   gridElement: {fileID: 1646532402612534335, guid: 82588966190aff14fabc090d37c70536, type: 3}
+  cornerElementList: []
   layerNumber: 4
   mergeProb: 0.8
-  learningEpoch: 100
+  learningEpoch: 64
   learningRate: 0.5
   fixAlpha: 1
-  floorNumber: 1
+  floorNumber: 3
   floorHeight: 1
+  showCorners: 1
 --- !u!4 &1729608223
 Transform:
   m_ObjectHideFlags: 0
