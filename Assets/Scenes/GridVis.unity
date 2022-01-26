@@ -600,7 +600,7 @@ MonoBehaviour:
   learningRate: 0.5
   fixAlpha: 1
   floorNumber: 3
-  floorHeight: 1
+  floorHeight: 0.6
   showCorners: 1
 --- !u!4 &1729608223
 Transform:

@@ -30,7 +30,9 @@ public class GridGenerator : MonoBehaviour
     GraphRelaxation graphRelaxation;
 
     public int floorNumber = 5;
-    public float floorHeight = 1.0f;
+
+    [SerializeField]
+    public float floorHeight = 0.4f;
 
     public bool showCorners = true;
 
@@ -69,7 +71,7 @@ public class GridGenerator : MonoBehaviour
                 Gizmos.DrawLine(elem.transform.position, elem.nextCoord);
                 if(elem.floor < floorNumber-1)
                 {
-                    Gizmos.DrawLine(elem.transform.position, new Vector3(elem.transform.position.x, elem.transform.position.y+1, elem.transform.position.z));
+                    Gizmos.DrawLine(elem.transform.position, new Vector3(elem.transform.position.x, elem.transform.position.y+floorHeight, elem.transform.position.z));
                 }
             }
         }
@@ -82,7 +84,7 @@ public class GridGenerator : MonoBehaviour
         {
             for (int floor = 0; floor < floorNumber; floor++)
             {
-                Vector3 coord = new Vector3(vertex.x, floor * floorHeight, vertex.y);
+                Vector3 coord = new Vector3(vertex.x, floor * floorHeight + 0.5f * floorHeight, vertex.y);
                 GridElement gridElementInst = Instantiate(gridElement, Vector3.zero, Quaternion.identity, this.transform);
                 gridElementInst.Instantiate(floor, coord);
                 if (!gridElementDict.ContainsKey(coord))
@@ -103,17 +105,25 @@ public class GridGenerator : MonoBehaviour
                             {
                                 int prevIndex = i == 0 ? adjPolygon.cornerGraphVertexList.Count - 1 : i - 1;
                                 int nextIndex = i == adjPolygon.cornerGraphVertexList.Count - 1 ? 0 : i + 1;
-                                prevCoord = new Vector3((adjPolygon.cornerGraphVertexList[prevIndex].x + vertex.x) / 2.0f, floor, (adjPolygon.cornerGraphVertexList[prevIndex].y + vertex.y) / 2.0f);
-                                nextCoord = new Vector3((adjPolygon.cornerGraphVertexList[nextIndex].x + vertex.x) / 2.0f, floor, (adjPolygon.cornerGraphVertexList[nextIndex].y + vertex.y) / 2.0f);
+                                prevCoord = new Vector3((adjPolygon.cornerGraphVertexList[prevIndex].x + vertex.x) / 2.0f, floor * floorHeight, (adjPolygon.cornerGraphVertexList[prevIndex].y + vertex.y) / 2.0f);
+                                nextCoord = new Vector3((adjPolygon.cornerGraphVertexList[nextIndex].x + vertex.x) / 2.0f, floor * floorHeight, (adjPolygon.cornerGraphVertexList[nextIndex].y + vertex.y) / 2.0f);
                             }
                         }
-                        Vector3 cornerCoord = new Vector3(adjPolygon.center.x, floor * floorHeight, adjPolygon.center.y);
-                        CornerElement cornerElementInst = Instantiate(cornerElement, Vector3.zero, Quaternion.identity, this.transform);
-                        cornerElementInst.Instantiate(floor, cornerCoord);
-                        cornerElementInst.prevCoord = prevCoord;
-                        cornerElementInst.nextCoord = nextCoord;
-                        gridElementInst.cornerList.Add(cornerElementInst);
-                        cornerElementList.Add(cornerElementInst);
+                        Vector3 cornerCoordLower = new Vector3(adjPolygon.center.x, floor * floorHeight, adjPolygon.center.y);
+                        CornerElement cornerElementLowerInst = Instantiate(cornerElement, Vector3.zero, Quaternion.identity, this.transform);
+                        cornerElementLowerInst.Instantiate(floor, cornerCoordLower);
+                        cornerElementLowerInst.prevCoord = prevCoord;
+                        cornerElementLowerInst.nextCoord = nextCoord;
+                        gridElementInst.cornerList.Add(cornerElementLowerInst);
+                        cornerElementList.Add(cornerElementLowerInst);
+
+                        Vector3 cornerCoordUpper = new Vector3(adjPolygon.center.x, (floor + 1) * floorHeight, adjPolygon.center.y);
+                        CornerElement cornerElementUpperInst = Instantiate(cornerElement, Vector3.zero, Quaternion.identity, this.transform);
+                        cornerElementUpperInst.Instantiate(floor, cornerCoordUpper);
+                        cornerElementUpperInst.prevCoord = new Vector3(prevCoord.x, prevCoord.y + floorHeight, prevCoord.z);
+                        cornerElementUpperInst.nextCoord = new Vector3(nextCoord.x, nextCoord.y + floorHeight, nextCoord.z);
+                        gridElementInst.cornerList.Add(cornerElementUpperInst);
+                        cornerElementList.Add(cornerElementUpperInst);
                     }
                 }
             }
