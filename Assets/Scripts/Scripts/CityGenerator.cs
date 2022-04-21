@@ -7,8 +7,12 @@ public class CityGenerator : MonoBehaviour
     public enum gridType { None, Road, Residential, Commercial };
     public int cityWidth = 50;
     public int cityHeight = 50;
+    public int basicBlockSize = 5;
 
     public List<List<GridItem>> grid = new List<List<GridItem>>();
+    public List<BlockItem> blockList = new List<BlockItem>();
+
+    private System.Random rand = new System.Random(System.Guid.NewGuid().GetHashCode());
 
     // Start is called before the first frame update
     void Start()
@@ -23,7 +27,7 @@ public class CityGenerator : MonoBehaviour
             }
             grid.Add(subGrid);
         }
-        GenerateAllSimple();
+        GenerateRoadGrid();
     }
 
     // Update is called once per frame
@@ -32,49 +36,50 @@ public class CityGenerator : MonoBehaviour
         
     }
 
-    public void GenerateRoadGrid()
+    public void RandomMergeBlocks()
     {
-        
+
     }
 
-    public void GenerateAllSimple()
+    public void GenerateRoadGrid()
     {
-        for (int i = 2; i < cityWidth-3; i++)
+        int horizontalStep = (int)Mathf.Ceil(cityWidth / basicBlockSize);
+        int verticalStep = (int)Mathf.Ceil(cityHeight / basicBlockSize);
+        for(int i = 0; i < horizontalStep; i++)
         {
-            grid[i][12].gridType = gridType.Commercial;
-            grid[i][13].gridType = gridType.Road;
-            grid[i][14].gridType = gridType.Commercial;
-        }
+            for(int j = 0; j < verticalStep; j++)
+            {
 
-        for (int j = 5; j < cityHeight; j++)
-        {
-            if (grid[28][j].gridType != gridType.Road)
-            {
-                grid[28][j].gridType = gridType.Residential;
-            }
-            if (grid[29][j].gridType != gridType.Road)
-            {
-                grid[29][j].gridType = gridType.Road;
-            }
-            if (grid[30][j].gridType != gridType.Road)
-            {
-                grid[30][j].gridType = gridType.Residential;
-            }
-        }
+                gridType currentType = rand.Next(0, 5) > 2 ? gridType.Commercial : gridType.Residential;
 
-        for (int j = 13; j < cityHeight - 6; j++)
-        {
-            if (grid[35][j].gridType != gridType.Road)
-            {
-                grid[35][j].gridType = gridType.Residential;
-            }
-            if (grid[36][j].gridType != gridType.Road)
-            {
-                grid[36][j].gridType = gridType.Road;
-            }
-            if (grid[37][j].gridType != gridType.Road)
-            {
-                grid[37][j].gridType = gridType.Residential;
+                grid[i * basicBlockSize + basicBlockSize - 1][j * basicBlockSize + basicBlockSize - 1].gridType = currentType;
+                grid[i * basicBlockSize + basicBlockSize - 1][j * basicBlockSize + basicBlockSize - 1].neighborTypeList[3] = gridType.Road;
+              
+                for (int p = 0; p < basicBlockSize; p++)
+                {
+                    grid[i * basicBlockSize + p][j * basicBlockSize].gridType = gridType.Road;
+                    if (p != 0 && p != basicBlockSize - 1)
+                    {
+                        grid[i * basicBlockSize + p][j * basicBlockSize + 1].gridType = currentType;
+                        grid[i * basicBlockSize + p][j * basicBlockSize + 1].neighborTypeList[0] = gridType.Road;
+
+                        grid[i * basicBlockSize + p][j * basicBlockSize + (basicBlockSize - 1)].gridType = currentType;
+                        grid[i * basicBlockSize + p][j * basicBlockSize + (basicBlockSize - 1)].neighborTypeList[2] = gridType.Road;
+                    }
+                }
+                for (int q = 0; q < basicBlockSize; q++)
+                {
+                    grid[i * basicBlockSize][j * basicBlockSize + q].gridType = gridType.Road;
+                    if (q != 0 && q != basicBlockSize - 1)
+                    {
+                        grid[i * basicBlockSize + 1][j * basicBlockSize + q].gridType = currentType;
+                        grid[i * basicBlockSize + 1][j * basicBlockSize + q].neighborTypeList[1] = gridType.Road;
+
+                        grid[i * basicBlockSize + (basicBlockSize - 1)][j * basicBlockSize + q].gridType = currentType;
+                        grid[i * basicBlockSize + (basicBlockSize - 1)][j * basicBlockSize + q].neighborTypeList[3] = gridType.Road;
+
+                    }
+                }
             }
         }
     }

@@ -33,7 +33,7 @@ public class RoadPlacement : MonoBehaviour
     void GenerateRoadList()
     {
         /*
-         初始化邻接列表
+         初始化道路邻接列表（上下左右）
          */
         for (int i = 0; i < cityGenerator.cityWidth; i++)
         {
@@ -81,7 +81,7 @@ public class RoadPlacement : MonoBehaviour
         }
     }
 
-    void PlaceRoadByGenerator()
+    private void PlaceRoadByGenerator()
     {
         GameObject tempObject = roadEnd.gameObject;
         foreach (RoadItem roadItem in roadList)
