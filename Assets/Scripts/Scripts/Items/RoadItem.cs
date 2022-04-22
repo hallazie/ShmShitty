@@ -51,7 +51,7 @@ public class RoadItem
         {
             // 4, corner, left
             this.roadType = 2;
-            this.roadDirection = 0;
+            this.roadDirection = 2;
         }
         else if (neighbors[0].gridType != roadEnum && neighbors[1].gridType == roadEnum && neighbors[2].gridType == roadEnum && neighbors[3].gridType != roadEnum)
         {
@@ -63,7 +63,7 @@ public class RoadItem
         {
             // 6, corner, right
             this.roadType = 2;
-            this.roadDirection = 2;
+            this.roadDirection = 0;
         }
         else if (neighbors[0].gridType == roadEnum && neighbors[1].gridType != roadEnum && neighbors[2].gridType != roadEnum && neighbors[3].gridType == roadEnum)
         {

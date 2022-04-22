@@ -82,6 +82,14 @@ public class CityGenerator : MonoBehaviour
                 }
             }
         }
+        for (int i = 0; i < cityWidth; i++)
+        {
+            grid[i][cityHeight-1].gridType = gridType.Road;
+        }
+        for (int i = 0; i < cityWidth; i++)
+        {
+            grid[cityWidth-1][i].gridType = gridType.Road;
+        }
     }
 
 }

@@ -7,9 +7,9 @@ public class BuildingPlacement : MonoBehaviour
     public CityGenerator cityGenerator;
     public RoadPlacement roadGenerator;
 
-    public static int commercialPrefabNum = 6;
+    public static int commercialPrefabNum = 10;
     public GameObject[] commercialPrefabList = new GameObject[commercialPrefabNum];
-    public static int residentialPrefabNum = 4;
+    public static int residentialPrefabNum = 10;
     public GameObject[] residentialPrefabList = new GameObject[residentialPrefabNum];
 
     private List<GameObject> commercialBuildingList = new List<GameObject>();
